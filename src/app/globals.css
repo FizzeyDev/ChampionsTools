@@ -1,0 +1,284 @@
+@import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@400;600;700;900&family=Rajdhani:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+
+:root {
+  /* Surfaces */
+  --color-paper: #090f10;
+  --color-panel: #101a1b;
+  --color-panel-soft: #152122;
+  --color-panel-strong: #1d2e2f;
+
+  /* Text */
+  --color-ink: #cfe0e2;
+  --color-ink-bright: #eaf6f7;
+  --color-ink-soft: #8aacaf;
+  --color-ink-dim: #5a7577;
+
+  /* Borders */
+  --color-line: rgba(255, 255, 255, 0.09);
+  --color-line-strong: rgba(255, 255, 255, 0.16);
+
+  /* Accent: Attaquant */
+  --color-league: #4fc3f7;
+  --color-league-dark: #2a94c2;
+  --color-league-soft: rgba(79, 195, 247, 0.14);
+  --color-league-glow: rgba(79, 195, 247, 0.25);
+
+  /* Accent: Défenseur */
+  --color-brick: #ff9d00;
+  --color-brick-dark: #cc7d00;
+  --color-brick-soft: rgba(255, 157, 0, 0.14);
+  --color-brick-glow: rgba(255, 157, 0, 0.25);
+
+  /* Accent: Terrain */
+  --color-violet: #9f53ec;
+  --color-violet-soft: rgba(159, 83, 236, 0.14);
+  --color-violet-glow: rgba(159, 83, 236, 0.25);
+
+  /* Statuses */
+  --color-amber: #ffd740;
+  --color-amber-soft: rgba(255, 215, 64, 0.14);
+  --color-danger: #ef5350;
+  --color-danger-soft: rgba(239, 83, 80, 0.14);
+  --color-success: #4caf82;
+  --color-success-soft: rgba(76, 175, 130, 0.14);
+
+  --radius-lg: 14px;
+  --radius-md: 10px;
+  --radius-sm: 7px;
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.55);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+
+  --font-display: "Exo 2", ui-sans-serif, sans-serif;
+  --font-body: "Rajdhani", ui-sans-serif, sans-serif;
+  --font-data: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+
+@theme inline {
+  --color-paper: var(--color-paper);
+  --color-panel: var(--color-panel);
+  --color-panel-soft: var(--color-panel-soft);
+  --color-panel-strong: var(--color-panel-strong);
+  --color-ink: var(--color-ink);
+  --color-ink-bright: var(--color-ink-bright);
+  --color-ink-soft: var(--color-ink-soft);
+  --color-ink-dim: var(--color-ink-dim);
+  --color-line: var(--color-line);
+  --color-line-strong: var(--color-line-strong);
+  --color-league: var(--color-league);
+  --color-league-dark: var(--color-league-dark);
+  --color-league-soft: var(--color-league-soft);
+  --color-brick: var(--color-brick);
+  --color-brick-dark: var(--color-brick-dark);
+  --color-brick-soft: var(--color-brick-soft);
+  --color-violet: var(--color-violet);
+  --color-violet-soft: var(--color-violet-soft);
+  --color-amber: var(--color-amber);
+  --color-amber-soft: var(--color-amber-soft);
+  --color-danger: var(--color-danger);
+  --color-danger-soft: var(--color-danger-soft);
+  --color-success: var(--color-success);
+  --color-success-soft: var(--color-success-soft);
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
+  --font-data: var(--font-data);
+}
+
+* {
+  border-color: var(--color-line);
+}
+
+html,
+body {
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+}
+
+body {
+  position: relative;
+}
+
+/* Subtle blueprint grid, matching the rest of the site */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: linear-gradient(rgba(79, 195, 247, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(79, 195, 247, 0.02) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+#__next,
+main {
+  position: relative;
+  z-index: 1;
+}
+
+::selection {
+  background: var(--color-league);
+  color: var(--color-paper);
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-panel-strong);
+  border-radius: 4px;
+}
+
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 5px;
+  border-radius: 3px;
+  background: var(--color-panel-strong);
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  margin-top: -6px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--color-league);
+  border: 2px solid var(--color-panel);
+  box-shadow: 0 0 8px var(--color-league-glow);
+  cursor: pointer;
+}
+
+input[type="range"]::-moz-range-track {
+  height: 5px;
+  border-radius: 3px;
+  background: var(--color-panel-strong);
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid var(--color-panel);
+  background: var(--color-league);
+  cursor: pointer;
+}
+
+.tabular {
+  font-family: var(--font-data);
+  font-variant-numeric: tabular-nums;
+}
+
+.heading {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+}
+
+.eyebrow {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-weight: 700;
+  font-size: 0.68rem;
+  color: var(--color-ink-dim);
+}
+
+.card-shell {
+  background: var(--color-panel);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.field-input {
+  background: var(--color-panel-soft);
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius-sm);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-weight: 600;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.field-input:focus {
+  outline: none;
+  border-color: var(--color-league);
+  box-shadow: 0 0 0 3px var(--color-league-soft);
+}
+
+.pill-btn {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.78rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--color-line-strong);
+  background: var(--color-panel-soft);
+  color: var(--color-ink-soft);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.pill-btn:hover {
+  transform: translateY(-1px);
+  color: var(--color-ink-bright);
+  border-color: var(--color-line-strong);
+}
+
+/* Custom checkbox: square, glows in the accent color when checked.
+   Override --checkbox-accent inline (e.g. style={{"--checkbox-accent": "var(--color-brick)"}})
+   to match a defender/other-side context; defaults to the league blue. */
+.field-checkbox {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  min-width: 16px;
+  border-radius: 4px;
+  border: 1px solid var(--color-line-strong);
+  background: var(--color-panel-strong);
+  cursor: pointer;
+  position: relative;
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  flex-shrink: 0;
+}
+.field-checkbox:hover {
+  border-color: var(--checkbox-accent, var(--color-league));
+}
+.field-checkbox:checked {
+  background: var(--checkbox-accent, var(--color-league));
+  border-color: var(--checkbox-accent, var(--color-league));
+  box-shadow: 0 0 8px color-mix(in srgb, var(--checkbox-accent, var(--color-league)) 60%, transparent);
+}
+.field-checkbox:checked::after {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 1px;
+  width: 4px;
+  height: 8px;
+  border: solid var(--color-paper);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+.field-checkbox:focus-visible {
+  outline: 2px solid var(--checkbox-accent, var(--color-league));
+  outline-offset: 1px;
+}
