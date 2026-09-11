@@ -5,6 +5,7 @@ import ResultRow from "./ResultRow";
 import { typeIconUrl, moveInfo } from "@/lib/sprites";
 import { useLocale } from "@/lib/i18n/LocaleContext";
 import type { MoveResult } from "@/lib/calcEngine";
+import type { PokemonState, FieldState } from "@/lib/types";
 
 const LIMIT_OPTIONS = [5, 10, 20, 50] as const;
 
@@ -18,6 +19,11 @@ interface ResultPanelProps {
    * change how many are visible (defaults to 5). Meant for long lists like
    * a full movepool scan — leave unset for the normal 4-move panels. */
   configurableLimit?: boolean;
+  /** Passed straight through to the active ResultRow so it can show the
+   * minimum-investment reverse calc. Omit to hide that section. */
+  attacker?: PokemonState;
+  defender?: PokemonState;
+  field?: FieldState;
 }
 
 export default function ResultPanel({
@@ -27,6 +33,9 @@ export default function ResultPanel({
   critMoves,
   onToggleCrit,
   configurableLimit = false,
+  attacker,
+  defender,
+  field,
 }: ResultPanelProps) {
   const { t } = useLocale();
   const [selected, setSelected] = useState(0);
@@ -112,7 +121,7 @@ export default function ResultPanel({
         </div>
       )}
 
-      {active && <ResultRow result={active} />}
+      {active && <ResultRow result={active} attacker={attacker} defender={defender} field={field} />}
     </section>
   );
 }

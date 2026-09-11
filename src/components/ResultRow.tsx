@@ -1,8 +1,11 @@
 "use client";
 
+import { useMemo } from "react";
 import { typeIconUrl, moveInfo } from "@/lib/sprites";
+import { minSpToSurvive, minSpToOhko } from "@/lib/features/reverseCalc";
 import { useLocale } from "@/lib/i18n/LocaleContext";
 import type { MoveResult } from "@/lib/calcEngine";
+import type { PokemonState, FieldState } from "@/lib/types";
 
 function koColor(text: string): string {
   if (/guaranteed/i.test(text)) return "var(--color-danger)";
@@ -10,10 +13,38 @@ function koColor(text: string): string {
   return "var(--color-ink-dim)";
 }
 
-export default function ResultRow({ result }: { result: MoveResult }) {
+const STAT_LABEL: Record<string, string> = {
+  def: "Def",
+  spd: "SpD",
+  atk: "Atk",
+  spa: "SpA",
+};
+
+interface ResultRowProps {
+  result: MoveResult;
+  /** When all three are provided, shows the minimum-investment reverse calc
+   * (SP needed to survive / to guarantee the OHKO) below the roll detail. */
+  attacker?: PokemonState;
+  defender?: PokemonState;
+  field?: FieldState;
+}
+
+export default function ResultRow({ result, attacker, defender, field }: ResultRowProps) {
   const { t } = useLocale();
-  const { type } = moveInfo(result.move);
+  const { type, category } = moveInfo(result.move);
   const icon = typeIconUrl(type);
+
+  const reverseCalc = useMemo(() => {
+    if (!attacker || !defender || !field || !result.range || result.error) return null;
+    if (category !== "Physical" && category !== "Special") return null;
+    const defStat = category === "Physical" ? "def" : "spd";
+    const atkStat = category === "Physical" ? "atk" : "spa";
+    return {
+      survive: minSpToSurvive(attacker, defender, field, result.move, defStat),
+      ohko: minSpToOhko(attacker, defender, field, result.move, atkStat),
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [attacker, defender, field, result.move, result.range, result.error, category]);
 
   if (result.error) {
     return (
@@ -106,6 +137,35 @@ export default function ResultRow({ result }: { result: MoveResult }) {
             ) : (
               <span className="italic">{t("result.hitDetailUnavailable")}</span>
             )}
+          </div>
+        </div>
+      )}
+
+      {reverseCalc && (
+        <div className="mt-2 grid grid-cols-2 gap-2 border-t pt-2" style={{ borderColor: "var(--color-line)" }}>
+          <div>
+            <p className="eyebrow mb-0.5" style={{ color: "var(--color-brick)" }}>
+              {t("reverse.survive")}
+            </p>
+            <p className="tabular text-xs" style={{ color: "var(--color-ink)" }}>
+              {reverseCalc.survive.minSp === null
+                ? t("reverse.impossible")
+                : reverseCalc.survive.minSp === 0
+                  ? t("reverse.alreadySafe")
+                  : t("reverse.spNeeded", { sp: reverseCalc.survive.minSp, stat: STAT_LABEL[reverseCalc.survive.statKey] })}
+            </p>
+          </div>
+          <div>
+            <p className="eyebrow mb-0.5" style={{ color: "var(--color-league)" }}>
+              {t("reverse.ohko")}
+            </p>
+            <p className="tabular text-xs" style={{ color: "var(--color-ink)" }}>
+              {reverseCalc.ohko.minSp === null
+                ? t("reverse.impossible")
+                : reverseCalc.ohko.minSp === 0
+                  ? t("reverse.alreadyGuaranteed")
+                  : t("reverse.spNeeded", { sp: reverseCalc.ohko.minSp, stat: STAT_LABEL[reverseCalc.ohko.statKey] })}
+            </p>
           </div>
         </div>
       )}
