@@ -24,7 +24,7 @@ const CHAMPIONS_POKEDEX_RAW: string[] = [
   "Torterra", "Infernape", "Empoleon", "Staraptor", "Luxray", "Roserade", "Rampardos",
   "Bastiodon", "Lopunny", "Spiritomb", "Garchomp", "Lucario", "Hippowdon", "Toxicroak",
   "Abomasnow", "Weavile", "Rhyperior", "Leafeon", "Glaceon", "Gliscor", "Mamoswine", "Gallade",
-  "Froslass", "Rotom",
+  "Froslass", "Rotom", "Rotom-Wash",
   // Unova
   "Serperior", "Emboar", "Samurott", "Watchog", "Liepard", "Simisage", "Simisear", "Simipour",
   "Musharna", "Excadrill", "Audino", "Conkeldurr", "Scolipede", "Whimsicott", "Krookodile",
@@ -52,6 +52,7 @@ const CHAMPIONS_POKEDEX_RAW: string[] = [
   // Reg M-C update (newer)
   "Salamence", "Golisopod", "Baxcalibur", "Rillaboom", "Mabosstiff", "Persian", "Persian-Alola",
   "Samurott-Hisui", "Inteleon", "Cinderace", "Arboliva", "Sirfetch'd", "Toxtricity", "Gogoat",
+  "Indeedee", "Indeedee-F", "Pawmot",
 ];
 
 // Safety net: dedupe in case a future edit accidentally re-adds a species

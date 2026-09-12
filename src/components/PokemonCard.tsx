@@ -20,6 +20,7 @@ import { getBaseStats } from "@/lib/champions/baseStats";
 import { getSpeciesAbilities } from "@/lib/features/speciesAbilities";
 import { getChampionsMoveset } from "@/lib/champions/moveset";
 import { autofillForSpecies } from "@/lib/features/autofillSpecies";
+import { getMetaSet } from "@/lib/champions/metaSets";
 import { getItemCategory, ITEM_CATEGORY_ORDER, type ItemCategory } from "@/lib/champions/itemCategories";
 import { HOLD_ITEMS, MEGA_STONES, NEW_MEGA_STONES, BERRIES } from "@/lib/champions/items";
 import { NATURE_EFFECTS, natureStatAbbr } from "@/lib/natures";
@@ -249,6 +250,8 @@ export default function PokemonCard({
             options={SPECIES_NAMES}
             allowEmpty={false}
             iconUrl={(v) => pokemonSpriteUrl(v, true)}
+            isMarked={(v) => !!getMetaSet(v)}
+            markedTitle={t("card.hasMetaSet")}
             onChange={handleSpeciesChange}
           />
           {types.length > 0 && (

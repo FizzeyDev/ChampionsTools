@@ -15,12 +15,10 @@ const gen9 = gens.get(9);
 //    verified against Serebii's Champions stat rankings
 //    (serebii.net/pokedex-champions/stat/*.shtml), not assumed or guessed.
 // Still pending (confirmed ability/type from the Champions ability table,
-// stats not yet verified): Victreebel, Clefable, Meganium, Feraligatr,
-// Skarmory, Chimecho, Staraptor, Emboar, Scolipede, Scrafty, Eelektross,
-// Golurk, Chesnaught, Crabominable, Drampa, Falinks, Scovillain. There's also
-// a newer Reg M-C update adding Mega Salamence, Mega Golisopod, Mega
-// Baxcalibur and ~20 new base Pokémon (Rillaboom, Mabosstiff, Indeedee...)
-// not yet reflected in champions/pokedex.ts or items.ts — a separate task.
+// stats not yet verified): Scovillain. There's also a newer Reg M-C update
+// adding Mega Salamence, Mega Golisopod, Mega Baxcalibur and ~20 new base
+// Pokémon (Rillaboom, Mabosstiff...) — see champions/pokedex.ts for the
+// current status of that list.
 
 interface MegaDef {
   name: string; // display name in the species picker
@@ -354,6 +352,13 @@ megaDefs.push({
   types: ["Fairy", "Flying"],
   baseStats: { hp: 95, atk: 80, def: 93, spa: 135, spd: 110, spe: 70 },
   ability: "Magic Guard",
+});
+megaDefs.push({
+  name: "Mega Floette",
+  baseSpeciesName: "Floette",
+  types: ["Fairy"],
+  baseStats: { hp: 74, atk: 85, def: 87, spa: 155, spd: 148, spe: 102 },
+  ability: "Fairy Aura",
 });
 
 // Reg M-C additions (newer update). Stats verified against Serebii's

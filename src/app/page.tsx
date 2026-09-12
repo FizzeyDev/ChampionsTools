@@ -371,7 +371,9 @@ export default function Home() {
           </>
         )}
 
-        <footer className="pb-4 text-center text-[11px] text-ink-dim">{t("app.footer")}</footer>
+        <footer className="flex flex-col items-center gap-1 pb-6 pt-2 text-center text-xs text-ink-dim sm:text-sm">
+          <p className="max-w-2xl">{t("app.footer")}</p>
+        </footer>
       </div>
 
       <SavedPokemonModal

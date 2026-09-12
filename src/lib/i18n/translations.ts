@@ -13,12 +13,17 @@ export const translations: Record<Locale, Record<string, string>> = {
     "app.showHeader": "Show header",
 
     "app.footer":
-      "Calculation engine: @smogon/calc — data: @pkmn/dex (Gen 9) + Champions data. Personal project, not affiliated with Smogon or Pokémon Champions.",
+      "Champions Calc is a fan-made tool, built on Smogon's damage calculation engine (@smogon/calc) and @pkmn/dex (Gen 9) data, with a Champions-specific data layer (Pokédex, Mega Evolutions, items) on top. Sprites from PokeAPI. Not affiliated with Smogon, PokeAPI, Game Freak, Nintendo, or The Pokémon Company.",
+    "app.footerSource": "View source on GitHub",
 
     "result.selectHint": "Select a move to see the detail",
     "result.needMove": "Select at least one move.",
     "result.notCalculable": "not calculable",
     "result.allRolls": "All rolls ({count})",
+    "result.roll.min": "Min",
+    "result.roll.mid": "Mid",
+    "result.roll.max": "Max",
+
     "result.hitDetail": "Per-hit detail",
     "result.hit": "Hit {n}",
     "result.hitDetailUnavailable": "Total range above, per-hit detail unavailable.",
@@ -63,6 +68,7 @@ export const translations: Record<Locale, Record<string, string>> = {
     "card.statBase": "Base",
     "card.natureNeutral": "Neutral",
     "card.itemLocked": "Locked — Mega Evolution requires holding this exact stone",
+    "card.hasMetaSet": "Has a curated real competitive set",
 
     "field.title": "Field",
     "field.format": "Format",
@@ -188,12 +194,17 @@ export const translations: Record<Locale, Record<string, string>> = {
     "app.showHeader": "Afficher l'en-tête",
 
     "app.footer":
-      "Moteur de calcul : @smogon/calc — données : @pkmn/dex (Gen 9) + data Champions. Projet perso, non affilié à Smogon ni à Pokémon Champions.",
+      "Champions Calc est un outil fait par un fan, construit sur le moteur de calcul de dégâts de Smogon (@smogon/calc) et les données @pkmn/dex (Gén. 9), avec une couche de données propre à Champions par-dessus (Pokédex, Méga-Évolutions, objets). Sprites fournis par PokeAPI. Non affilié à Smogon, PokeAPI, Game Freak, Nintendo ou The Pokémon Company.",
+    "app.footerSource": "Voir le code source sur GitHub",
 
     "result.selectHint": "Sélectionne une capacité pour voir le détail",
     "result.needMove": "Sélectionne au moins une capacité.",
     "result.notCalculable": "non calculable",
     "result.allRolls": "Tous les rolls ({count})",
+    "result.roll.min": "Min",
+    "result.roll.mid": "Moy",
+    "result.roll.max": "Max",
+
     "result.hitDetail": "Détail par coup",
     "result.hit": "Coup {n}",
     "result.hitDetailUnavailable": "Plage totale ci-dessus, détail par coup non disponible.",
@@ -238,6 +249,7 @@ export const translations: Record<Locale, Record<string, string>> = {
     "card.statBase": "Base",
     "card.natureNeutral": "Neutre",
     "card.itemLocked": "Verrouillé — la Méga-Évolution demande de tenir exactement cette pierre",
+    "card.hasMetaSet": "A un set compétitif réel et vérifié",
 
     "field.title": "Terrain",
     "field.format": "Format",

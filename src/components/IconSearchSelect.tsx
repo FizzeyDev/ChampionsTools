@@ -7,6 +7,7 @@ interface Option {
   value: string;
   subtitle?: ReactNode;
   preferred?: boolean;
+  marked?: boolean;
 }
 
 type Row = { kind: "header"; label: string } | { kind: "option"; opt: Option };
@@ -28,6 +29,11 @@ interface IconSearchSelectProps {
    * categories). Options not covered by groupOf fall in an "Other" bucket. */
   groupOf?: (value: string) => string;
   groupOrder?: string[];
+  /** Small badge shown at the end of a matching option's row (e.g. a star
+   * marking Pokémon with a curated real competitive set). Purely cosmetic —
+   * doesn't affect sorting or filtering. */
+  isMarked?: (value: string) => boolean;
+  markedTitle?: string;
 }
 
 export default function IconSearchSelect({
@@ -43,6 +49,8 @@ export default function IconSearchSelect({
   preferredLabel,
   groupOf,
   groupOrder,
+  isMarked,
+  markedTitle,
 }: IconSearchSelectProps) {
   const { t } = useLocale();
   const [query, setQuery] = useState(value);
@@ -64,10 +72,10 @@ export default function IconSearchSelect({
       const out: Row[] = [];
       if (preferred.length) {
         out.push({ kind: "header", label: preferredLabel ?? t("select.preferred") });
-        for (const v of preferred) out.push({ kind: "option", opt: { value: v, subtitle: subtitle?.(v), preferred: true } });
+        for (const v of preferred) out.push({ kind: "option", opt: { value: v, subtitle: subtitle?.(v), preferred: true, marked: isMarked?.(v) } });
         out.push({ kind: "header", label: t("select.allOptions") });
       }
-      for (const v of rest) out.push({ kind: "option", opt: { value: v, subtitle: subtitle?.(v) } });
+      for (const v of rest) out.push({ kind: "option", opt: { value: v, subtitle: subtitle?.(v), marked: isMarked?.(v) } });
       return out;
     }
 
@@ -87,15 +95,15 @@ export default function IconSearchSelect({
         out.push({ kind: "header", label: g });
         for (const v of vals) {
           if (shown >= 90) break;
-          out.push({ kind: "option", opt: { value: v, subtitle: subtitle?.(v) } });
+          out.push({ kind: "option", opt: { value: v, subtitle: subtitle?.(v), marked: isMarked?.(v) } });
           shown++;
         }
       }
       return out;
     }
 
-    return matched.slice(0, 60).map((v) => ({ kind: "option" as const, opt: { value: v, subtitle: subtitle?.(v) } }));
-  }, [query, options, subtitle, isPreferred, preferredLabel, groupOf, groupOrder, t]);
+    return matched.slice(0, 60).map((v) => ({ kind: "option" as const, opt: { value: v, subtitle: subtitle?.(v), marked: isMarked?.(v) } }));
+  }, [query, options, subtitle, isPreferred, preferredLabel, groupOf, groupOrder, isMarked, t]);
 
   const optionRows = rows.filter((r): r is { kind: "option"; opt: Option } => r.kind === "option");
 
@@ -223,7 +231,7 @@ export default function IconSearchSelect({
                       onError={(e) => ((e.target as HTMLImageElement).style.visibility = "hidden")}
                     />
                   )}
-                  <span className="flex flex-col leading-tight">
+                  <span className="flex flex-1 flex-col leading-tight">
                     <span>{opt.value}</span>
                     {opt.subtitle && (
                       <span className="text-xs" style={{ color: "var(--color-ink-dim)" }}>
@@ -231,6 +239,15 @@ export default function IconSearchSelect({
                       </span>
                     )}
                   </span>
+                  {opt.marked && (
+                    <span
+                      className="shrink-0 text-xs"
+                      style={{ color: "var(--color-amber)" }}
+                      title={markedTitle}
+                    >
+                      ★
+                    </span>
+                  )}
                 </button>
               );
             });

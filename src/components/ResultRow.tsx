@@ -1,11 +1,19 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { typeIconUrl, moveInfo } from "@/lib/sprites";
 import { minSpToSurvive, minSpToOhko } from "@/lib/features/reverseCalc";
 import { useLocale } from "@/lib/i18n/LocaleContext";
 import type { MoveResult } from "@/lib/calcEngine";
 import type { PokemonState, FieldState } from "@/lib/types";
+
+type RollTier = "min" | "mid" | "max";
+
+const TIER_COLOR: Record<RollTier, string> = {
+  min: "var(--color-success)",
+  mid: "var(--color-amber)",
+  max: "var(--color-danger)",
+};
 
 function koColor(text: string): string {
   if (/guaranteed/i.test(text)) return "var(--color-danger)";
@@ -33,6 +41,16 @@ export default function ResultRow({ result, attacker, defender, field }: ResultR
   const { t } = useLocale();
   const { type, category } = moveInfo(result.move);
   const icon = typeIconUrl(type);
+  const [activeTiers, setActiveTiers] = useState<Set<RollTier>>(new Set());
+
+  const toggleTier = (tier: RollTier) => {
+    setActiveTiers((prev) => {
+      const next = new Set(prev);
+      if (next.has(tier)) next.delete(tier);
+      else next.add(tier);
+      return next;
+    });
+  };
 
   const reverseCalc = useMemo(() => {
     if (!attacker || !defender || !field || !result.range || result.error) return null;
@@ -99,30 +117,61 @@ export default function ResultRow({ result, attacker, defender, field }: ResultR
         {result.koText}
       </p>
 
-      {result.rolls && (
-        <div className="mt-2">
-          <p className="eyebrow mb-1">{t("result.allRolls", { count: result.rolls.length })}</p>
-          <p className="tabular flex flex-wrap gap-1.5 text-[11px]" style={{ color: "var(--color-ink-dim)" }}>
-            {(() => {
-              const map = new Map<number, number>();
-              for (const r of result.rolls) map.set(r, (map.get(r) ?? 0) + 1);
-              return [...map.entries()]
-                .sort((a, b) => a[0] - b[0])
-                .map(([value, count]) => (
+      {result.rolls && result.rolls.length > 0 && (() => {
+        const sorted = [...result.rolls].sort((a, b) => a - b);
+        const lowValue = sorted[0];
+        const maxValue = sorted[sorted.length - 1];
+        const midValue = sorted[Math.floor(sorted.length / 2)];
+        const tierValue: Record<RollTier, number> = { min: lowValue, mid: midValue, max: maxValue };
+
+        return (
+          <div className="mt-2">
+            <div className="mb-1.5 flex flex-wrap items-center gap-1.5">
+              <p className="eyebrow">{t("result.allRolls", { count: result.rolls.length })}</p>
+              <span className="flex gap-1">
+                {(["min", "mid", "max"] as RollTier[]).map((tier) => {
+                  const isActive = activeTiers.has(tier);
+                  return (
+                    <button
+                      key={tier}
+                      type="button"
+                      onClick={() => toggleTier(tier)}
+                      className="tabular rounded-[6px] px-1.5 py-0.5 text-[0.62rem] font-bold transition"
+                      style={{
+                        background: isActive ? TIER_COLOR[tier] : "var(--color-panel-strong)",
+                        color: isActive ? "var(--color-paper)" : "var(--color-ink-dim)",
+                        border: `1px solid ${isActive ? TIER_COLOR[tier] : "var(--color-line-strong)"}`,
+                      }}
+                    >
+                      {t(`result.roll.${tier}`)} {tierValue[tier]}
+                    </button>
+                  );
+                })}
+              </span>
+            </div>
+            <p className="tabular flex flex-wrap gap-1.5 text-[11px]" style={{ color: "var(--color-ink-dim)" }}>
+              {sorted.map((value, i) => {
+                const matchedTier = (["min", "mid", "max"] as RollTier[]).find(
+                  (tier) => activeTiers.has(tier) && tierValue[tier] === value
+                );
+                return (
                   <span
-                    key={value}
+                    key={i}
                     className="rounded-[6px] px-1.5 py-0.5"
-                    style={{ background: "var(--color-panel-strong)" }}
-                    title={`${count}/16`}
+                    style={
+                      matchedTier
+                        ? { background: TIER_COLOR[matchedTier], color: "var(--color-paper)", fontWeight: 700 }
+                        : { background: "var(--color-panel-strong)" }
+                    }
                   >
                     {value}
-                    {count > 1 && <span style={{ opacity: 0.6 }}>×{count}</span>}
                   </span>
-                ));
-            })()}
-          </p>
-        </div>
-      )}
+                );
+              })}
+            </p>
+          </div>
+        );
+      })()}
 
       {result.multihit && (
         <div className="mt-2">
