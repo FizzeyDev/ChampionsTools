@@ -32,6 +32,27 @@ export default function Home() {
   const [bestForward, setBestForward] = useState<MoveResult[]>([]);
   const [bestBackward, setBestBackward] = useState<MoveResult[]>([]);
   const [bestLoading, setBestLoading] = useState(false);
+  const [headerCollapsed, setHeaderCollapsed] = useState(false);
+
+  useEffect(() => {
+    try {
+      setHeaderCollapsed(window.localStorage.getItem("champcalc.headerCollapsed") === "1");
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  const toggleHeader = () => {
+    setHeaderCollapsed((c) => {
+      const next = !c;
+      try {
+        window.localStorage.setItem("champcalc.headerCollapsed", next ? "1" : "0");
+      } catch {
+        // ignore
+      }
+      return next;
+    });
+  };
 
   // Champions matches are 3v3 (Singles) or 4v4 (Doubles) — never 6v6, even
   // though you build a roster of 6 beforehand. Team-mode rosters are capped
@@ -124,79 +145,90 @@ export default function Home() {
   return (
     <div className="min-h-screen">
       <header
-        className="sticky top-0 z-30 flex flex-wrap items-center justify-between gap-3 px-5 py-4"
+        className="sticky top-0 z-30 w-full"
         style={{
           background: "linear-gradient(180deg, var(--color-panel-soft) 0%, var(--color-panel) 100%)",
           borderBottom: "1px solid var(--color-line)",
-          boxShadow: "var(--shadow-md)",
         }}
       >
-        <div>
+        <div className="flex items-center justify-between gap-2 px-3 py-2 sm:px-5 sm:py-2">
           <h1
-            className="heading text-2xl"
+            className="heading truncate text-base sm:text-2xl"
             style={{ color: "var(--color-ink-bright)", textShadow: "0 0 30px var(--color-league-glow)" }}
           >
             {t("app.title")}
           </h1>
-          <p className="text-xs text-ink-dim">{t("app.subtitle")}</p>
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <div className="flex overflow-hidden rounded-full" style={{ border: "1px solid var(--color-line-strong)" }}>
-            {(["1v1", "1vAll", "Allv1", "AllvAll", "bestMoves"] as Mode[]).map((m) => (
-              <button
-                key={m}
-                onClick={() => setMode(m)}
-                className="px-2.5 py-1.5 text-[0.68rem] font-bold uppercase tracking-wide transition"
-                style={{
-                  background: mode === m ? "var(--color-violet)" : "var(--color-panel-soft)",
-                  color: mode === m ? "var(--color-paper)" : "var(--color-ink-soft)",
-                }}
-              >
-                {t(`team.mode.${m}`)}
-              </button>
-            ))}
-          </div>
-          <div className="flex overflow-hidden rounded-full" style={{ border: "1px solid var(--color-line-strong)" }}>
-            {LOCALES.map((l) => (
-              <button
-                key={l}
-                onClick={() => setLocale(l)}
-                className="px-2.5 py-1.5 text-[0.7rem] font-bold uppercase tracking-wide transition"
-                style={{
-                  background: locale === l ? "var(--color-league)" : "var(--color-panel-soft)",
-                  color: locale === l ? "var(--color-paper)" : "var(--color-ink-soft)",
-                }}
-              >
-                {l}
-              </button>
-            ))}
-          </div>
-          <button onClick={share} className="pill-btn" style={{ color: "var(--color-violet)", borderColor: "rgba(159,83,236,0.4)", background: "var(--color-violet-soft)" }}>
-            🔗 {copied ? t("app.linkCopied") : t("app.copyLink")}
-          </button>
           <button
-            onClick={() => setShowSaved(true)}
-            className="pill-btn"
-            style={{ color: "var(--color-amber)", borderColor: "rgba(255,215,64,0.4)", background: "var(--color-amber-soft)" }}
+            type="button"
+            onClick={toggleHeader}
+            className="shrink-0 rounded-full px-2 py-1 text-xs"
+            style={{ border: "1px solid var(--color-line-strong)", color: "var(--color-ink-dim)" }}
+            title={headerCollapsed ? t("app.showHeader") : t("app.hideHeader")}
           >
-            ★ {t("saved.viewButton")}
+            {headerCollapsed ? "▾" : "▴"}
           </button>
-          {(mode === "1v1" || mode === "bestMoves") && (
-            <button
-              onClick={swap}
-              className="pill-btn"
-              style={{ color: "var(--color-league)", borderColor: "rgba(79,195,247,0.4)", background: "var(--color-league-soft)" }}
-            >
-              ⇄ {t("app.swap")}
-            </button>
-          )}
         </div>
+
+        {!headerCollapsed && (
+          <div className="flex flex-wrap items-center gap-2 px-3 pb-3 sm:px-5">
+            <p className="w-full text-xs text-ink-dim">{t("app.subtitle")}</p>
+            <div className="flex overflow-hidden rounded-full" style={{ border: "1px solid var(--color-line-strong)" }}>
+              {(["1v1", "1vAll", "Allv1", "AllvAll", "bestMoves"] as Mode[]).map((m) => (
+                <button
+                  key={m}
+                  onClick={() => setMode(m)}
+                  className="px-2 py-1.5 text-[0.62rem] font-bold uppercase tracking-wide transition sm:px-2.5 sm:text-[0.68rem]"
+                  style={{
+                    background: mode === m ? "var(--color-violet)" : "var(--color-panel-soft)",
+                    color: mode === m ? "var(--color-paper)" : "var(--color-ink-soft)",
+                  }}
+                >
+                  {t(`team.mode.${m}`)}
+                </button>
+              ))}
+            </div>
+            <div className="flex overflow-hidden rounded-full" style={{ border: "1px solid var(--color-line-strong)" }}>
+              {LOCALES.map((l) => (
+                <button
+                  key={l}
+                  onClick={() => setLocale(l)}
+                  className="px-2.5 py-1.5 text-[0.7rem] font-bold uppercase tracking-wide transition"
+                  style={{
+                    background: locale === l ? "var(--color-league)" : "var(--color-panel-soft)",
+                    color: locale === l ? "var(--color-paper)" : "var(--color-ink-soft)",
+                  }}
+                >
+                  {l}
+                </button>
+              ))}
+            </div>
+            <button onClick={share} className="pill-btn" style={{ color: "var(--color-violet)", borderColor: "rgba(159,83,236,0.4)", background: "var(--color-violet-soft)" }}>
+              🔗 {copied ? t("app.linkCopied") : t("app.copyLink")}
+            </button>
+            <button
+              onClick={() => setShowSaved(true)}
+              className="pill-btn"
+              style={{ color: "var(--color-amber)", borderColor: "rgba(255,215,64,0.4)", background: "var(--color-amber-soft)" }}
+            >
+              ★ {t("saved.viewButton")}
+            </button>
+            {(mode === "1v1" || mode === "bestMoves") && (
+              <button
+                onClick={swap}
+                className="pill-btn"
+                style={{ color: "var(--color-league)", borderColor: "rgba(79,195,247,0.4)", background: "var(--color-league-soft)" }}
+              >
+                ⇄ {t("app.swap")}
+              </button>
+            )}
+          </div>
+        )}
       </header>
 
       <div className="mx-auto flex w-full max-w-[1600px] flex-col gap-5 px-4 py-6 sm:px-6">
         {mode === "1v1" && (
           <>
-            <div className="grid gap-5 lg:grid-cols-2">
+            <div className="grid grid-cols-2 gap-2 sm:gap-5">
               <ResultPanel
                 title={`${attacker.species || t("card.attacker")} → ${defender.species || t("card.defender")}`}
                 accent="league"
@@ -228,7 +260,7 @@ export default function Home() {
 
         {mode === "1vAll" && (
           <>
-            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            <div className="grid grid-cols-2 gap-2 sm:gap-4 xl:grid-cols-3">
               {team.map((member, i) => (
                 <ResultPanel
                   key={i}
@@ -256,7 +288,7 @@ export default function Home() {
 
         {mode === "Allv1" && (
           <>
-            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            <div className="grid grid-cols-2 gap-2 sm:gap-4 xl:grid-cols-3">
               {team.map((member, i) => (
                 <ResultPanel
                   key={i}
@@ -297,7 +329,7 @@ export default function Home() {
 
         {mode === "bestMoves" && (
           <>
-            <div className="grid gap-5 lg:grid-cols-2">
+            <div className="grid grid-cols-2 gap-2 sm:gap-5">
               <ResultPanel
                 title={`${attacker.species || t("card.attacker")} → ${defender.species || t("card.defender")}${bestLoading ? "…" : ""}`}
                 accent="league"

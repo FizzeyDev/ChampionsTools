@@ -9,6 +9,9 @@ export const translations: Record<Locale, Record<string, string>> = {
     "app.copyLink": "Copy link",
     "app.linkCopied": "Link copied!",
     "app.swap": "Swap",
+    "app.hideHeader": "Hide header",
+    "app.showHeader": "Show header",
+
     "app.footer":
       "Calculation engine: @smogon/calc — data: @pkmn/dex (Gen 9) + Champions data. Personal project, not affiliated with Smogon or Pokémon Champions.",
 
@@ -181,6 +184,9 @@ export const translations: Record<Locale, Record<string, string>> = {
     "app.copyLink": "Copier le lien",
     "app.linkCopied": "Lien copié !",
     "app.swap": "Inverser",
+    "app.hideHeader": "Masquer l'en-tête",
+    "app.showHeader": "Afficher l'en-tête",
+
     "app.footer":
       "Moteur de calcul : @smogon/calc — données : @pkmn/dex (Gen 9) + data Champions. Projet perso, non affilié à Smogon ni à Pokémon Champions.",
 

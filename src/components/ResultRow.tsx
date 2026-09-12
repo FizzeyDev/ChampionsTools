@@ -142,7 +142,7 @@ export default function ResultRow({ result, attacker, defender, field }: ResultR
       )}
 
       {reverseCalc && (
-        <div className="mt-2 grid grid-cols-2 gap-2 border-t pt-2" style={{ borderColor: "var(--color-line)" }}>
+        <div className="mt-2 grid grid-cols-1 gap-2 border-t pt-2 sm:grid-cols-2" style={{ borderColor: "var(--color-line)" }}>
           <div>
             <p className="eyebrow mb-0.5" style={{ color: "var(--color-brick)" }}>
               {t("reverse.survive")}

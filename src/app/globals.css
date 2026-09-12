@@ -96,6 +96,20 @@ body {
   font-family: var(--font-body);
 }
 
+/* Phones: scale the whole rem-based sizing system down (padding, gaps, most
+   text) so more fits on screen without stacking everything into an endless
+   single column. Cards stay full readable width, just less padded/large. */
+@media (max-width: 640px) {
+  html {
+    font-size: 13px;
+  }
+}
+@media (max-width: 400px) {
+  html {
+    font-size: 12px;
+  }
+}
+
 body {
   position: relative;
 }
