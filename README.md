@@ -17,7 +17,7 @@ Then open [http://localhost:3000](http://localhost:3000).
 
 - **Next.js 16** (App Router) + **React 19** + **TypeScript** — 100% client-side, no backend
 - **Tailwind CSS v4** for styling
-- **[@smogon/calc](https://github.com/smogon/damage-calc)** — the actual damage calculation engine
+- **[@smogon/calc](https://github.com/smogon/damage-calc)** — the actual damage calculation engine (see Credits)
 - **[@pkmn/dex](https://github.com/pkmn/ps) / @pkmn/data** — Gen 9 species/move/ability/nature data, used as the base layer Champions data is built on top of
 
 ## Modes
@@ -25,7 +25,10 @@ Then open [http://localhost:3000](http://localhost:3000).
 - **1 vs 1** — the classic calculator: two Pokémon, damage both ways
 - **1 vs All** — one Pokémon against a full team (paste a Showdown-format team or build it manually)
 - **All vs 1** — a full team against one Pokémon
+- **All vs All** — two full teams, a clickable matchup matrix showing each attacker's best move against each defender, color-coded by damage tier
 - **Best Moves** — pick two Pokémon (with real EVs, boosts, item, nature) and see every move in their **entire real movepool** ranked by damage, not just 4 hand-picked moves. Ability is restricted to the Pokémon's actual abilities in this mode; item stays free.
+
+Team-mode rosters (1 vs All / All vs 1 / All vs All) are capped to **3 Pokémon in Singles, 4 in Doubles** — Champions matches are never 6v6, even though you build a roster of 6 beforehand. The cap follows the Format selector in the Field panel automatically.
 
 ## What's Champions-specific here
 
@@ -36,15 +39,15 @@ assumed from the base Gen 9 dex.
 ### Pokédex
 
 Only the Pokémon actually obtainable in Champions are selectable —
-`src/lib/champions/pokedex.ts` holds the exact roster (currently 222 unique
-species), cross-checked against the game's own Pokédex listing rather than
-the full ~1000-species national dex. Two "Past"-tagged data-layer bugs were
-found and fixed along the way: `@pkmn/dex` silently drops ~44 species (Absol,
-Alakazam, Beedrill...) and ~82 items (every Mega Stone) from its Gen 9-filtered
-views since they're not part of Scarlet/Violet's own regional dex — both now
-fall back to the raw, unfiltered dex so they resolve correctly everywhere
-(species lookups, sprites, and — critically — the damage calc itself, which
-would otherwise throw on any Mega holding its own stone).
+`src/lib/champions/pokedex.ts` holds the exact roster, cross-checked against
+the game's own Pokédex listing rather than the full ~1000-species national
+dex. Two "Past"-tagged data-layer bugs were found and fixed along the way:
+`@pkmn/dex` silently drops dozens of species (Absol, Alakazam, Beedrill...)
+and every Mega Stone item from its Gen 9-filtered views since they're not
+part of Scarlet/Violet's own regional dex — both now fall back to the raw,
+unfiltered dex so they resolve correctly everywhere (species lookups,
+sprites, movesets, and — critically — the damage calc itself, which would
+otherwise throw on any Mega holding its own stone).
 
 ### Stat Points, not EVs
 
@@ -64,10 +67,10 @@ the game's own item menu categories.
 
 ### Mega Evolution
 
-All 81 official Mega Stones (`serebii.net/pokemonchampions/items.shtml`) have
-a matching implementation in `src/lib/champions/megaSpecies.ts` — both the
-~36 classic Gen 6/7 Megas (stats pulled straight from `@pkmn/dex`, since
-those never change) and the newer Champions-exclusive ones introduced with
+All official Mega Stones (`serebii.net/pokemonchampions/items.shtml`) have a
+matching implementation in `src/lib/champions/megaSpecies.ts` — both the
+classic Gen 6/7 Megas (stats pulled straight from `@pkmn/dex`, since those
+never change) and the newer Champions-exclusive ones introduced with
 Pokémon Legends: Z-A, verified stat-by-stat against Serebii's Champions stat
 rankings rather than guessed.
 
@@ -94,12 +97,21 @@ ability-triggered / allies-fainted toggles — modeled symmetrically on both
 sides of the field (either Pokémon can be the one behind Stealth Rock),
 matching how Smogon's own calculator treats it.
 
+### Minimum-investment reverse calc
+
+Select any damaging move's result to see two extra lines: the minimum Stat
+Points the defender needs in Def/SpD to guarantee surviving that exact hit,
+and the minimum Stat Points the attacker needs in Atk/SpA to guarantee the
+OHKO — everything else on both sides held fixed. See
+`src/lib/features/reverseCalc.ts`.
+
 ## Other features
 
 - **EN / FR** interface, switchable at any time, persisted locally
 - **Save Pokémon builds** to the browser (name them, recall them later, assign to either side) — `src/lib/features/savedPokemon.ts`
-- **Import/export** single sets or full 6-Pokémon teams in Showdown's plain-text format
+- **Import/export** single sets or full teams in Showdown's plain-text format
 - **Shareable links** — the whole battle state round-trips through a URL
+- A free-text notes panel (bottom of the Field column) for scratch strategy notes, saved to the browser as you type
 - Type effectiveness chart per Pokémon (×4 down to ×0)
 - Per-hit damage breakdown on multi-hit moves (Smogon's own calculator only shows the combined range)
 - Custom-styled checkboxes and search inputs that open the mobile keyboard properly (plain `<input>`, no custom widget)
@@ -129,9 +141,9 @@ both handled in `src/lib/features/spriteOverrides.ts`:
   regulation re-enables it.
 - **Multi-generation support** — Gen 9 only, since that's what Champions is
   built on. No RBY-through-SV era selector.
-- Only a handful of Mega abilities/stats that don't have a confirmed source
-  yet remain unverified best-effort placeholders — check the comments at the
-  top of `megaSpecies.ts` for the current list.
+- A handful of Mega abilities/stats that don't have a confirmed source yet
+  remain unverified best-effort placeholders — check the comments at the top
+  of `megaSpecies.ts` for the current list.
 
 ## Adding new data
 
@@ -147,7 +159,8 @@ items). To add something new:
   (not level-50 calculated stats), and ability. Source stats from
   `serebii.net/pokedex-champions/<name>/` or the stat-ranking pages under
   `serebii.net/pokedex-champions/stat/`. Nothing else needs touching —
-  sprites, the type chart, and the calc engine all pick it up automatically.
+  sprites, the type chart, movesets, and the calc engine all pick it up
+  automatically.
 - **An item**: add it to the right array in `src/lib/champions/items.ts`
   (`HOLD_ITEMS`, `MEGA_STONES`/`NEW_MEGA_STONES`, or `BERRIES`). If its
   sprite 404s, add its kebab-case name to `MISSING_ITEM_SPRITES` in
@@ -169,33 +182,51 @@ src/
     showdownSet.ts                   # Showdown set/team import & export
     champions/                        # Champions-specific game data
       items.ts                          # exact item pool, categorized
-      megaSpecies.ts                      # Mega Evolution data layer
-      pokedex.ts                           # exact obtainable species list
-      statPoints.ts                         # Stat Points <-> EV conversion
-      itemCategories.ts                      # item menu-tab categorization
-      baseStats.ts                            # base stat lookups
-      moveset.ts                               # real Gen 9 movepool lookups
-      bestMoves.ts                              # full-movepool damage scan
-    features/                                  # reusable app-level tools
-      savedPokemon.ts                            # localStorage save/load
-      speciesAbilities.ts                         # real-ability lookups
-      megaStoneLookup.ts                           # Mega -> exact stone
-      autofillSpecies.ts                            # species-select autofill
-      spriteOverrides.ts                             # sprite ID/alias fixes
+      itemCategories.ts                   # item menu-tab categorization
+      megaSpecies.ts                        # Mega Evolution data layer
+      pokedex.ts                             # exact obtainable species list
+      statPoints.ts                            # Stat Points <-> EV conversion
+      baseStats.ts                              # base stat lookups
+      moveset.ts                                 # real Gen 9 movepool lookups
+    features/                                    # reusable app-level tools
+      savedPokemon.ts                              # localStorage save/load
+      notes.ts                                       # scratchpad persistence
+      speciesAbilities.ts                             # real-ability lookups
+      megaStoneLookup.ts                               # Mega -> exact stone
+      autofillSpecies.ts                                # species-select autofill
+      bestMoves.ts                                       # full-movepool damage scan
+      reverseCalc.ts                                      # min-investment calc
+      spriteOverrides.ts                                   # sprite ID/alias fixes
   components/
     IconSearchSelect.tsx        # searchable combobox (icons, groups, highlighting)
     StatRow.tsx                  # one stat's SP slider + base/total readout
     PokemonCard.tsx                # attacker/defender panel
     TeamRoster.tsx                  # team import + roster editor
-    FieldBar.tsx                     # weather/terrain/hazards/screens/Ruin
-    ResultPanel.tsx                   # move list + click-to-expand detail
-    ResultRow.tsx                      # Showdown-style result line + rolls
-    TypeChart.tsx                       # weakness/resistance display
-    SavedPokemonModal.tsx                # saved-builds browser
+    AllVsAllMatrix.tsx               # team-vs-team matchup grid
+    FieldBar.tsx                      # weather/terrain/hazards/screens/Ruin
+    NotesPanel.tsx                      # inline scratchpad
+    ResultPanel.tsx                      # move list + click-to-expand detail
+    ResultRow.tsx                         # Showdown-style result line + rolls + reverse calc
+    TypeChart.tsx                          # weakness/resistance display
+    SavedPokemonModal.tsx                    # saved-builds browser
   app/
-    page.tsx                              # assembles everything, mode switching
-    layout.tsx                             # locale provider, page shell
+    page.tsx                                  # assembles everything, mode switching
+    layout.tsx                                 # locale provider, page shell
   i18n/
-    translations.ts                         # EN/FR strings
-    LocaleContext.tsx                        # locale state + t() hook
+    translations.ts                             # EN/FR strings
+    LocaleContext.tsx                            # locale state + t() hook
 ```
+
+## Credits
+
+The actual damage math — every stat formula, ability interaction, item
+effect, and field mechanic — comes from
+**[Smogon's `@smogon/calc`](https://github.com/smogon/damage-calc)**
+(MIT licensed), the same engine behind Smogon's own online damage
+calculator. This project only adds the Champions-specific data layer and UI
+on top of it; none of the underlying battle mechanics were reimplemented
+from scratch. Species/move/ability/nature data comes from
+[`@pkmn/dex`](https://github.com/pkmn/ps) (also MIT), and sprite artwork
+from the [PokeAPI sprites repo](https://github.com/PokeAPI/sprites). This
+project is a fan-made tool, not affiliated with Smogon, PokeAPI, Game Freak,
+Nintendo, or The Pokémon Company.
