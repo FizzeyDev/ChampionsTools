@@ -3,6 +3,11 @@ import { champGen } from "./champions/megaSpecies";
 import { REGIONAL_ARTWORK_IDS, MISSING_ITEM_SPRITES, MEGA_ARTWORK_IDS, ITEM_SPRITE_ALIASES } from "./features/spriteOverrides";
 
 const SPRITES_BASE = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites";
+// Needed so /custom-sprites/... (a real file in our own /public folder)
+// still resolves correctly when the site is deployed under a subpath, e.g.
+// GitHub Pages project sites (username.github.io/repo-name/...). Set at
+// build time — see next.config.ts.
+const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
 // Official game type IDs (Normal…Stellar), used by the sprites repo's
 // generation-ix/scarlet-violet type icon set.
@@ -69,7 +74,7 @@ export function itemSpriteUrl(item: string | undefined): string | null {
   if (!item) return null;
   const kebab = toKebab(item);
   if (MISSING_ITEM_SPRITES.includes(kebab)) {
-    return `/custom-sprites/items/${kebab}.png`;
+    return `${BASE_PATH}/custom-sprites/items/${kebab}.png`;
   }
   const resolved = ITEM_SPRITE_ALIASES[kebab] ?? kebab;
   return `${SPRITES_BASE}/items/${resolved}.png`;

@@ -2,6 +2,7 @@
 
 import { TERRAIN_VALUES, WEATHER_VALUES } from "@/lib/gen";
 import { useLocale } from "@/lib/i18n/LocaleContext";
+import NotesPanel from "./NotesPanel";
 import type { FieldState, SideState } from "@/lib/types";
 
 interface FieldBarProps {
@@ -240,6 +241,8 @@ export default function FieldBar({ state, onChange }: FieldBarProps) {
           title={t("card.defender")}
         />
       </div>
+
+      <NotesPanel />
     </section>
   );
 }

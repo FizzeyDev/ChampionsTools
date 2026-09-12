@@ -138,7 +138,7 @@ export function exportShowdownSet(state: PokemonState): string {
  * more blank lines. Sets whose first line doesn't resolve to a known
  * species are silently skipped. Returns up to 6 Pokémon.
  */
-export function parseShowdownTeam(text: string): PokemonState[] {
+export function parseShowdownTeam(text: string, max = 6): PokemonState[] {
   const chunks = text
     .split(/\n\s*\n/)
     .map((c) => c.trim())
@@ -147,7 +147,7 @@ export function parseShowdownTeam(text: string): PokemonState[] {
   for (const chunk of chunks) {
     const parsed = parseShowdownSet(chunk);
     if (parsed) team.push(parsed);
-    if (team.length >= 6) break;
+    if (team.length >= max) break;
   }
   return team;
 }

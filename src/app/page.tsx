@@ -5,8 +5,8 @@ import PokemonCard from "@/components/PokemonCard";
 import FieldBar from "@/components/FieldBar";
 import ResultPanel from "@/components/ResultPanel";
 import TeamRoster from "@/components/TeamRoster";
+import AllVsAllMatrix from "@/components/AllVsAllMatrix";
 import SavedPokemonModal from "@/components/SavedPokemonModal";
-import SpeedTierModal from "@/components/SpeedTierModal";
 import { computeMoveResults, type MoveResult } from "@/lib/calcEngine";
 import { computeBestMoves } from "@/lib/features/bestMoves";
 import { defaultField, defaultPokemon } from "@/lib/types";
@@ -16,7 +16,7 @@ import { useLocale } from "@/lib/i18n/LocaleContext";
 import { LOCALES } from "@/lib/i18n/translations";
 import type { PokemonState } from "@/lib/types";
 
-type Mode = "1v1" | "1vAll" | "Allv1" | "bestMoves";
+type Mode = "1v1" | "1vAll" | "Allv1" | "AllvAll" | "bestMoves";
 
 export default function Home() {
   const { locale, setLocale, t } = useLocale();
@@ -25,13 +25,23 @@ export default function Home() {
   const [attacker, setAttacker] = useState(() => defaultPokemon("Abomasnow"));
   const [defender, setDefender] = useState(() => defaultPokemon("Abomasnow"));
   const [team, setTeam] = useState<PokemonState[]>([]);
+  const [teamB, setTeamB] = useState<PokemonState[]>([]);
   const [field, setField] = useState(defaultField);
   const [copied, setCopied] = useState(false);
   const [showSaved, setShowSaved] = useState(false);
-  const [showSpeed, setShowSpeed] = useState(false);
   const [bestForward, setBestForward] = useState<MoveResult[]>([]);
   const [bestBackward, setBestBackward] = useState<MoveResult[]>([]);
   const [bestLoading, setBestLoading] = useState(false);
+
+  // Champions matches are 3v3 (Singles) or 4v4 (Doubles) — never 6v6, even
+  // though you build a roster of 6 beforehand. Team-mode rosters are capped
+  // to the active battle size, and trimmed automatically if the format
+  // switches to a smaller one.
+  const maxTeamSize = field.gameType === "Singles" ? 3 : 4;
+  useEffect(() => {
+    setTeam((t) => (t.length > maxTeamSize ? t.slice(0, maxTeamSize) : t));
+    setTeamB((t) => (t.length > maxTeamSize ? t.slice(0, maxTeamSize) : t));
+  }, [maxTeamSize]);
 
   useEffect(() => {
     const shared = readStateFromLocation();
@@ -132,7 +142,7 @@ export default function Home() {
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <div className="flex overflow-hidden rounded-full" style={{ border: "1px solid var(--color-line-strong)" }}>
-            {(["1v1", "1vAll", "Allv1", "bestMoves"] as Mode[]).map((m) => (
+            {(["1v1", "1vAll", "Allv1", "AllvAll", "bestMoves"] as Mode[]).map((m) => (
               <button
                 key={m}
                 onClick={() => setMode(m)}
@@ -170,13 +180,6 @@ export default function Home() {
             style={{ color: "var(--color-amber)", borderColor: "rgba(255,215,64,0.4)", background: "var(--color-amber-soft)" }}
           >
             ★ {t("saved.viewButton")}
-          </button>
-          <button
-            onClick={() => setShowSpeed(true)}
-            className="pill-btn"
-            style={{ color: "var(--color-violet)", borderColor: "rgba(159,83,236,0.4)", background: "var(--color-violet-soft)" }}
-          >
-            ⚡ {t("speed.viewButton")}
           </button>
           {(mode === "1v1" || mode === "bestMoves") && (
             <button
@@ -246,7 +249,7 @@ export default function Home() {
             <div className="grid gap-5 xl:grid-cols-[0.85fr_560px_0.85fr]">
               <PokemonCard role="attacker" accent="league" state={attacker} onChange={setAttacker} />
               <FieldBar state={field} onChange={setField} />
-              <TeamRoster team={team} onChange={setTeam} accent="brick" />
+              <TeamRoster team={team} onChange={setTeam} accent="brick" maxSize={maxTeamSize} />
             </div>
           </>
         )}
@@ -272,9 +275,22 @@ export default function Home() {
               )}
             </div>
             <div className="grid gap-5 xl:grid-cols-[0.85fr_560px_0.85fr]">
-              <TeamRoster team={team} onChange={setTeam} accent="league" />
+              <TeamRoster team={team} onChange={setTeam} accent="league" maxSize={maxTeamSize} />
               <FieldBar state={field} onChange={setField} />
               <PokemonCard role="defender" accent="brick" state={defender} onChange={setDefender} />
+            </div>
+          </>
+        )}
+
+        {mode === "AllvAll" && (
+          <>
+            <div className="card-shell p-4">
+              <AllVsAllMatrix teamA={team} teamB={teamB} field={field} />
+            </div>
+            <div className="grid gap-5 xl:grid-cols-[1fr_560px_1fr]">
+              <TeamRoster team={team} onChange={setTeam} accent="league" maxSize={maxTeamSize} />
+              <FieldBar state={field} onChange={setField} />
+              <TeamRoster team={teamB} onChange={setTeamB} accent="brick" maxSize={maxTeamSize} />
             </div>
           </>
         )}
@@ -333,21 +349,6 @@ export default function Home() {
           if (role === "attacker") setAttacker(pkm);
           else setDefender(pkm);
         }}
-      />
-
-      <SpeedTierModal
-        open={showSpeed}
-        onClose={() => setShowSpeed(false)}
-        field={field}
-        entries={[
-          { label: t("card.attacker"), accent: "league", state: attacker },
-          { label: t("card.defender"), accent: "brick", state: defender },
-          ...team.map((member, i) => ({
-            label: `${t("team.roster")} ${i + 1}`,
-            accent: (mode === "Allv1" ? "league" : "brick") as "league" | "brick",
-            state: member,
-          })),
-        ]}
       />
     </div>
   );

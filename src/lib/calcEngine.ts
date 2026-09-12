@@ -30,7 +30,7 @@ export function buildPokemon(state: PokemonState) {
   });
 }
 
-export function buildField(field: FieldState) {
+function buildField(field: FieldState) {
   return new Field({
     gameType: field.gameType,
     weather: (field.weather || undefined) as never,

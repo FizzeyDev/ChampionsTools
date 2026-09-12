@@ -13,9 +13,11 @@ interface TeamRosterProps {
   team: PokemonState[];
   onChange: (team: PokemonState[]) => void;
   accent: "league" | "brick";
+  /** Max team size — 3 for Singles, 4 for Doubles (Champions battle team size, not the 6-Pokémon roster you build from). */
+  maxSize: number;
 }
 
-export default function TeamRoster({ team, onChange, accent }: TeamRosterProps) {
+export default function TeamRoster({ team, onChange, accent, maxSize }: TeamRosterProps) {
   const { t } = useLocale();
   const [activeIndex, setActiveIndex] = useState(0);
   const [showImport, setShowImport] = useState(team.length === 0);
@@ -25,7 +27,7 @@ export default function TeamRoster({ team, onChange, accent }: TeamRosterProps) 
   const accentVar = accent === "league" ? "var(--color-league)" : "var(--color-brick)";
 
   const importTeam = () => {
-    const parsed = parseShowdownTeam(teamText);
+    const parsed = parseShowdownTeam(teamText, maxSize);
     if (parsed.length === 0) {
       setImportError(t("team.importError"));
       return;
@@ -38,7 +40,7 @@ export default function TeamRoster({ team, onChange, accent }: TeamRosterProps) 
   };
 
   const addSlot = async () => {
-    if (team.length >= 6) return;
+    if (team.length >= maxSize) return;
     const newMember = await autofillForSpecies(defaultPokemon("Abomasnow"), "Abomasnow");
     onChange([...team, newMember]);
     setActiveIndex(team.length);
@@ -122,7 +124,7 @@ export default function TeamRoster({ team, onChange, accent }: TeamRosterProps) 
             </button>
           );
         })}
-        {team.length < 6 && (
+        {team.length < maxSize && (
           <button
             type="button"
             onClick={addSlot}
