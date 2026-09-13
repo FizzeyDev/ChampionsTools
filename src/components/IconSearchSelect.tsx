@@ -34,6 +34,9 @@ interface IconSearchSelectProps {
    * doesn't affect sorting or filtering. */
   isMarked?: (value: string) => boolean;
   markedTitle?: string;
+  /** Tooltip shown when hovering the closed field (e.g. the current
+   * item/ability/move's official description). Not shown while typing. */
+  valueTitle?: string;
 }
 
 export default function IconSearchSelect({
@@ -51,6 +54,7 @@ export default function IconSearchSelect({
   groupOrder,
   isMarked,
   markedTitle,
+  valueTitle,
 }: IconSearchSelectProps) {
   const { t } = useLocale();
   const [query, setQuery] = useState(value);
@@ -132,6 +136,7 @@ export default function IconSearchSelect({
           style={{ paddingLeft: icon ? "2.25rem" : "0.75rem" }}
           value={open ? query : value}
           placeholder={placeholder}
+          title={!open ? valueTitle : undefined}
           onFocus={() => {
             setOpen(true);
             setQuery("");

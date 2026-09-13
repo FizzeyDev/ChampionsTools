@@ -1,7 +1,8 @@
-import { champGen } from "../champions/megaSpecies";
+import { champGen, MEGA_SPECIES_NAMES } from "../champions/megaSpecies";
 import { MEGA_STONES, NEW_MEGA_STONES } from "../champions/items";
 
 const ALL_STONES = [...MEGA_STONES, ...NEW_MEGA_STONES];
+const MEGA_NAME_SET = new Set(MEGA_SPECIES_NAMES);
 
 function suffix(name: string): "Z" | "X" | "Y" | null {
   if (/\bZ$/.test(name)) return "Z";
@@ -18,9 +19,15 @@ function suffix(name: string): "Z" | "X" | "Y" | null {
  */
 export function getMegaStoneItem(megaSpeciesName: string): string | null {
   if (!megaSpeciesName) return null;
+  // Checking against our own defined Mega list (rather than "does this
+  // species' baseSpecies differ from its own name") matters: ANY alternate
+  // forme (Floette-Eternal, Rotom-Wash, regional forms...) has a different
+  // baseSpecies too, and would otherwise be misdetected as a Mega and
+  // incorrectly locked onto that base species' Mega Stone.
+  if (!MEGA_NAME_SET.has(megaSpeciesName)) return null;
   const id = megaSpeciesName.toLowerCase().replace(/[^a-z0-9]/g, "");
   const s = champGen.species.get(id) as { baseSpecies?: string; name?: string } | undefined;
-  if (!s?.baseSpecies || s.baseSpecies === megaSpeciesName) return null; // not a Mega (base form)
+  if (!s?.baseSpecies) return null;
 
   const candidates = ALL_STONES.filter((stone) => stone.species === s.baseSpecies);
   if (candidates.length === 0) return null;

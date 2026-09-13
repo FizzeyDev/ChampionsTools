@@ -6,17 +6,19 @@ import FieldBar from "@/components/FieldBar";
 import ResultPanel from "@/components/ResultPanel";
 import TeamRoster from "@/components/TeamRoster";
 import AllVsAllMatrix from "@/components/AllVsAllMatrix";
+import SpeedComparator from "@/components/SpeedComparator";
 import SavedPokemonModal from "@/components/SavedPokemonModal";
 import { computeMoveResults, type MoveResult } from "@/lib/calcEngine";
 import { computeBestMoves } from "@/lib/features/bestMoves";
 import { defaultField, defaultPokemon } from "@/lib/types";
 import { autofillForSpecies } from "@/lib/features/autofillSpecies";
+import { syncFieldForAbilityToggle } from "@/lib/features/abilityFieldSync";
 import { buildShareUrl, readStateFromLocation } from "@/lib/shareLink";
 import { useLocale } from "@/lib/i18n/LocaleContext";
 import { LOCALES } from "@/lib/i18n/translations";
 import type { PokemonState } from "@/lib/types";
 
-type Mode = "1v1" | "1vAll" | "Allv1" | "AllvAll" | "bestMoves";
+type Mode = "1v1" | "1vAll" | "Allv1" | "AllvAll" | "bestMoves" | "speedTiers";
 
 export default function Home() {
   const { locale, setLocale, t } = useLocale();
@@ -111,6 +113,21 @@ export default function Home() {
     setDefender(attacker);
   };
 
+  // Auto-turns the matching weather/terrain on (or back off) when "ability
+  // triggered" is checked/unchecked for a Pokémon with Drought, Drizzle,
+  // Electric Surge, etc. — see abilityFieldSync.ts for the safety rules
+  // that keep this from overriding an unrelated field setup.
+  const handleAttackerChange = (next: PokemonState) => {
+    const patch = syncFieldForAbilityToggle(attacker.abilityOn, next, field);
+    if (patch) setField((f) => ({ ...f, ...patch }));
+    setAttacker(next);
+  };
+  const handleDefenderChange = (next: PokemonState) => {
+    const patch = syncFieldForAbilityToggle(defender.abilityOn, next, field);
+    if (patch) setField((f) => ({ ...f, ...patch }));
+    setDefender(next);
+  };
+
   const toggleCrit = (
     setter: (next: PokemonState) => void,
     source: PokemonState,
@@ -173,7 +190,7 @@ export default function Home() {
           <div className="flex flex-wrap items-center gap-2 px-3 pb-3 sm:px-5">
             <p className="w-full text-xs text-ink-dim">{t("app.subtitle")}</p>
             <div className="flex overflow-hidden rounded-full" style={{ border: "1px solid var(--color-line-strong)" }}>
-              {(["1v1", "1vAll", "Allv1", "AllvAll", "bestMoves"] as Mode[]).map((m) => (
+              {(["1v1", "1vAll", "Allv1", "AllvAll", "bestMoves", "speedTiers"] as Mode[]).map((m) => (
                 <button
                   key={m}
                   onClick={() => setMode(m)}
@@ -251,9 +268,9 @@ export default function Home() {
               />
             </div>
             <div className="grid gap-5 xl:grid-cols-[0.85fr_560px_0.85fr]">
-              <PokemonCard role="attacker" accent="league" state={attacker} onChange={setAttacker} />
+              <PokemonCard role="attacker" accent="league" state={attacker} onChange={handleAttackerChange} />
               <FieldBar state={field} onChange={setField} />
-              <PokemonCard role="defender" accent="brick" state={defender} onChange={setDefender} />
+              <PokemonCard role="defender" accent="brick" state={defender} onChange={handleDefenderChange} />
             </div>
           </>
         )}
@@ -279,7 +296,7 @@ export default function Home() {
               )}
             </div>
             <div className="grid gap-5 xl:grid-cols-[0.85fr_560px_0.85fr]">
-              <PokemonCard role="attacker" accent="league" state={attacker} onChange={setAttacker} />
+              <PokemonCard role="attacker" accent="league" state={attacker} onChange={handleAttackerChange} />
               <FieldBar state={field} onChange={setField} />
               <TeamRoster team={team} onChange={setTeam} accent="brick" maxSize={maxTeamSize} />
             </div>
@@ -309,7 +326,7 @@ export default function Home() {
             <div className="grid gap-5 xl:grid-cols-[0.85fr_560px_0.85fr]">
               <TeamRoster team={team} onChange={setTeam} accent="league" maxSize={maxTeamSize} />
               <FieldBar state={field} onChange={setField} />
-              <PokemonCard role="defender" accent="brick" state={defender} onChange={setDefender} />
+              <PokemonCard role="defender" accent="brick" state={defender} onChange={handleDefenderChange} />
             </div>
           </>
         )}
@@ -326,6 +343,8 @@ export default function Home() {
             </div>
           </>
         )}
+
+        {mode === "speedTiers" && <SpeedComparator />}
 
         {mode === "bestMoves" && (
           <>
@@ -354,7 +373,7 @@ export default function Home() {
                 role="attacker"
                 accent="league"
                 state={attacker}
-                onChange={setAttacker}
+                onChange={handleAttackerChange}
                 showMoves={false}
                 restrictAbilityToReal
               />
@@ -363,7 +382,7 @@ export default function Home() {
                 role="defender"
                 accent="brick"
                 state={defender}
-                onChange={setDefender}
+                onChange={handleDefenderChange}
                 showMoves={false}
                 restrictAbilityToReal
               />

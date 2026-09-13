@@ -21,6 +21,7 @@ import { getSpeciesAbilities } from "@/lib/features/speciesAbilities";
 import { getChampionsMoveset } from "@/lib/champions/moveset";
 import { autofillForSpecies } from "@/lib/features/autofillSpecies";
 import { getMetaSet } from "@/lib/champions/metaSets";
+import { getMoveDescription, getAbilityDescription, getItemDescription } from "@/lib/champions/descriptions";
 import { getItemCategory, ITEM_CATEGORY_ORDER, type ItemCategory } from "@/lib/champions/itemCategories";
 import { HOLD_ITEMS, MEGA_STONES, NEW_MEGA_STONES, BERRIES } from "@/lib/champions/items";
 import { NATURE_EFFECTS, natureStatAbbr } from "@/lib/natures";
@@ -324,6 +325,8 @@ export default function PokemonCard({
             options={filteredItemNames}
             placeholder="—"
             iconUrl={itemSpriteUrl}
+            subtitle={(v) => getItemDescription(v) || undefined}
+            valueTitle={getItemDescription(state.item)}
             groupOf={itemFilter === "all" ? itemGroupOf : undefined}
             groupOrder={itemFilter === "all" ? itemGroupOrder : undefined}
             onChange={(v) => update("item", v)}
@@ -335,6 +338,8 @@ export default function PokemonCard({
           options={restrictAbilityToReal && realAbilities.length ? realAbilities : ABILITY_NAMES}
           placeholder="—"
           isPreferred={(v) => realAbilities.includes(v)}
+          subtitle={(v) => getAbilityDescription(v) || undefined}
+          valueTitle={getAbilityDescription(state.ability)}
           onChange={(v) => update("ability", v)}
         />
         <div className="flex flex-col gap-1">
@@ -479,8 +484,18 @@ export default function PokemonCard({
                 iconUrl={(v) => typeIconUrl(moveInfo(v).type)}
                 subtitle={(v) => {
                   const info = moveInfo(v);
-                  return info.type ? `${info.type} · ${info.category} · BP ${info.bp ?? 0}` : undefined;
+                  const desc = getMoveDescription(v);
+                  if (!info.type) return undefined;
+                  return (
+                    <>
+                      <span className="block">
+                        {info.type} · {info.category} · BP {info.bp ?? 0}
+                      </span>
+                      {desc && <span className="block" style={{ opacity: 0.8 }}>{desc}</span>}
+                    </>
+                  );
                 }}
+                valueTitle={getMoveDescription(m)}
                 isPreferred={(v) => moveset.has(v)}
                 onChange={(v) => {
                   const moves = [...state.moves];

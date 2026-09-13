@@ -53,6 +53,11 @@ const CHAMPIONS_POKEDEX_RAW: string[] = [
   "Salamence", "Golisopod", "Baxcalibur", "Rillaboom", "Mabosstiff", "Persian", "Persian-Alola",
   "Samurott-Hisui", "Inteleon", "Cinderace", "Arboliva", "Sirfetch'd", "Toxtricity", "Gogoat",
   "Indeedee", "Indeedee-F", "Pawmot",
+  // Found via Pikalytics' live usage feed — legitimate, played forms missing from our list
+  "Floette-Eternal", "Arcanine-Hisui", "Ninetales-Alola", "Lycanroc-Dusk", "Lycanroc-Midnight",
+  "Zoroark-Hisui", "Rotom-Heat", "Rotom-Mow", "Rotom-Frost", "Typhlosion-Hisui", "Decidueye-Hisui",
+  "Slowking-Galar", "Slowbro-Galar", "Goodra-Hisui", "Tauros-Paldea-Aqua", "Tauros-Paldea-Blaze",
+  "Basculegion-F", "Raichu-Alola", "Meowstic-F", "Avalugg-Hisui",
 ];
 
 // Safety net: dedupe in case a future edit accidentally re-adds a species
