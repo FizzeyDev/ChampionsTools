@@ -3,6 +3,7 @@
 import { useState } from "react";
 import ResultRow from "./ResultRow";
 import { typeIconUrl, moveInfo } from "@/lib/sprites";
+import { toFrench } from "@/lib/champions/gameTranslations";
 import { useLocale } from "@/lib/i18n/LocaleContext";
 import type { MoveResult } from "@/lib/calcEngine";
 import type { PokemonState, FieldState } from "@/lib/types";
@@ -37,7 +38,7 @@ export default function ResultPanel({
   defender,
   field,
 }: ResultPanelProps) {
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
   const [selected, setSelected] = useState(0);
   const [limit, setLimit] = useState(5);
   const accentVar = accent === "league" ? "var(--color-league)" : "var(--color-brick)";
@@ -91,7 +92,7 @@ export default function ResultPanel({
                 }}
               >
                 {icon && <img src={icon} alt="" className="h-4 w-4 shrink-0 object-contain" />}
-                <span className="flex-1 truncate text-left">{r.move}</span>
+                <span className="flex-1 truncate text-left">{locale === "fr" ? toFrench("move", r.move) : r.move}</span>
                 {onToggleCrit && (
                   <button
                     type="button"

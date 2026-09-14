@@ -360,6 +360,13 @@ megaDefs.push({
   baseStats: { hp: 74, atk: 85, def: 87, spa: 155, spd: 148, spe: 102 },
   ability: "Fairy Aura",
 });
+megaDefs.push({
+  name: "Mega Dragalge",
+  baseSpeciesName: "Dragalge",
+  types: ["Poison", "Dragon"],
+  baseStats: { hp: 65, atk: 85, def: 105, spa: 132, spd: 163, spe: 44 },
+  ability: "Regenerator", // confirmed via Champions ability table (Régé-Force)
+});
 
 // Reg M-C additions (newer update). Stats verified against Serebii's
 // Champions stat rankings; Golisopod's exact ability wasn't visible in the

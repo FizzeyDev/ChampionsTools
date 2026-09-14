@@ -5,6 +5,7 @@ import { pokemonSpriteUrl } from "@/lib/sprites";
 import { useLocale } from "@/lib/i18n/LocaleContext";
 import { STAT_POINT_CAP } from "@/lib/champions/statPoints";
 import { isMegaSpecies, type SpeedRowConfig } from "@/lib/features/speedComparator";
+import { toFrench } from "@/lib/champions/gameTranslations";
 
 interface SpeedTierRowProps {
   config: SpeedRowConfig;
@@ -16,7 +17,7 @@ interface SpeedTierRowProps {
 }
 
 export default function SpeedTierRow({ config, baseSpeed, finalSpeed, accent, onChange, onRemove }: SpeedTierRowProps) {
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
   const [expanded, setExpanded] = useState(false);
   const art = pokemonSpriteUrl(config.species, true);
   const accentVar =
@@ -38,7 +39,7 @@ export default function SpeedTierRow({ config, baseSpeed, finalSpeed, accent, on
         {art && <img src={art} alt="" className="h-9 w-9 shrink-0 object-contain" />}
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-bold" style={{ color: "var(--color-ink-bright)" }} title={config.species}>
-            {config.species}
+            {locale === "fr" ? toFrench("species", config.species) : config.species}
           </p>
           <p className="tabular text-[10px]" style={{ color: "var(--color-ink-dim)" }}>
             {t("speed.base")} {baseSpeed}

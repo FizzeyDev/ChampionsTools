@@ -67,6 +67,7 @@ export default function SpeedComparator() {
               options={SPECIES_NAMES}
               allowEmpty={false}
               iconUrl={(v) => pokemonSpriteUrl(v, true)}
+              translateKind="species"
               onChange={handleReferenceChange}
             />
           </div>
@@ -139,6 +140,7 @@ export default function SpeedComparator() {
               options={SPECIES_NAMES}
               placeholder="—"
               iconUrl={(v) => pokemonSpriteUrl(v, true)}
+              translateKind="species"
               onChange={(v) => {
                 if (v && v !== reference && !manualExtra.includes(v)) {
                   setManualExtra((prev) => [...prev, v]);

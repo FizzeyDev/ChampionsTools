@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useLocale } from "@/lib/i18n/LocaleContext";
+import { toFrench, matchesBilingual } from "@/lib/champions/gameTranslations";
 
 interface Option {
   value: string;
@@ -37,6 +38,11 @@ interface IconSearchSelectProps {
   /** Tooltip shown when hovering the closed field (e.g. the current
    * item/ability/move's official description). Not shown while typing. */
   valueTitle?: string;
+  /** When set, options are shown in French (with the English value kept as
+   * the real underlying value) when the site's locale is French, and
+   * searching matches either language regardless of the current locale
+   * (e.g. typing "Sarmurai" finds Golisopod even in the English UI). */
+  translateKind?: "species" | "move" | "ability" | "item" | "nature";
 }
 
 export default function IconSearchSelect({
@@ -55,20 +61,26 @@ export default function IconSearchSelect({
   isMarked,
   markedTitle,
   valueTitle,
+  translateKind,
 }: IconSearchSelectProps) {
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
   const [query, setQuery] = useState(value);
   const [open, setOpen] = useState(false);
   const [highlight, setHighlight] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  const displayName = (v: string) => (translateKind && locale === "fr" ? toFrench(translateKind, v) : v);
+
   useEffect(() => {
-    if (!open) setQuery(value);
-  }, [value, open]);
+    if (!open) setQuery(displayName(value));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value, open, locale]);
 
   const rows: Row[] = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    const matched = q ? options.filter((o) => o.toLowerCase().includes(q)) : options;
+    const q = query.trim();
+    const matched = q
+      ? options.filter((o) => (translateKind ? matchesBilingual(translateKind, o, q) : o.toLowerCase().includes(q.toLowerCase())))
+      : options;
 
     if (isPreferred) {
       const preferred = matched.filter((v) => isPreferred(v)).slice(0, 40);
@@ -107,13 +119,13 @@ export default function IconSearchSelect({
     }
 
     return matched.slice(0, 60).map((v) => ({ kind: "option" as const, opt: { value: v, subtitle: subtitle?.(v), marked: isMarked?.(v) } }));
-  }, [query, options, subtitle, isPreferred, preferredLabel, groupOf, groupOrder, isMarked, t]);
+  }, [query, options, subtitle, isPreferred, preferredLabel, groupOf, groupOrder, isMarked, translateKind, t]);
 
   const optionRows = rows.filter((r): r is { kind: "option"; opt: Option } => r.kind === "option");
 
   const commit = (v: string) => {
     onChange(v);
-    setQuery(v);
+    setQuery(displayName(v));
     setOpen(false);
   };
 
@@ -134,7 +146,7 @@ export default function IconSearchSelect({
         <input
           className="field-input w-full py-2 pr-3"
           style={{ paddingLeft: icon ? "2.25rem" : "0.75rem" }}
-          value={open ? query : value}
+          value={open ? query : displayName(value)}
           placeholder={placeholder}
           title={!open ? valueTitle : undefined}
           onFocus={() => {
@@ -161,13 +173,13 @@ export default function IconSearchSelect({
               else if (allowEmpty && query.trim() === "") commit("");
             } else if (e.key === "Escape") {
               setOpen(false);
-              setQuery(value);
+              setQuery(displayName(value));
             }
           }}
           onBlur={() => {
             window.setTimeout(() => {
               setOpen(false);
-              setQuery(value);
+              setQuery(displayName(value));
             }, 100);
           }}
         />
@@ -237,7 +249,7 @@ export default function IconSearchSelect({
                     />
                   )}
                   <span className="flex flex-1 flex-col leading-tight">
-                    <span>{opt.value}</span>
+                    <span>{displayName(opt.value)}</span>
                     {opt.subtitle && (
                       <span className="text-xs" style={{ color: "var(--color-ink-dim)" }}>
                         {opt.subtitle}

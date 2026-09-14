@@ -3,6 +3,7 @@
 import { useState } from "react";
 import PokemonCard from "./PokemonCard";
 import { pokemonSpriteUrl } from "@/lib/sprites";
+import { toFrench } from "@/lib/champions/gameTranslations";
 import { parseShowdownTeam } from "@/lib/showdownSet";
 import { useLocale } from "@/lib/i18n/LocaleContext";
 import { defaultPokemon } from "@/lib/types";
@@ -18,7 +19,7 @@ interface TeamRosterProps {
 }
 
 export default function TeamRoster({ team, onChange, accent, maxSize }: TeamRosterProps) {
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
   const [activeIndex, setActiveIndex] = useState(0);
   const [showImport, setShowImport] = useState(team.length === 0);
   const [teamText, setTeamText] = useState("");
@@ -107,7 +108,7 @@ export default function TeamRoster({ team, onChange, accent, maxSize }: TeamRost
             >
               {art && <img src={art} alt="" className="h-9 w-9 object-contain" />}
               <span className="max-w-[3.5rem] truncate text-[0.6rem]" style={{ color: "var(--color-ink-soft)" }}>
-                {p.species || "—"}
+                {(locale === "fr" && p.species ? toFrench("species", p.species) : p.species) || "—"}
               </span>
               <span
                 role="button"

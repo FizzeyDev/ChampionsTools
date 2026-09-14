@@ -22,6 +22,7 @@ import { getChampionsMoveset } from "@/lib/champions/moveset";
 import { autofillForSpecies } from "@/lib/features/autofillSpecies";
 import { getMetaSet } from "@/lib/champions/metaSets";
 import { getMoveDescription, getAbilityDescription, getItemDescription } from "@/lib/champions/descriptions";
+import { toFrench, toFrenchType } from "@/lib/champions/gameTranslations";
 import { getItemCategory, ITEM_CATEGORY_ORDER, type ItemCategory } from "@/lib/champions/itemCategories";
 import { HOLD_ITEMS, MEGA_STONES, NEW_MEGA_STONES, BERRIES } from "@/lib/champions/items";
 import { NATURE_EFFECTS, natureStatAbbr } from "@/lib/natures";
@@ -56,7 +57,7 @@ export default function PokemonCard({
   showMoves = true,
   restrictAbilityToReal = false,
 }: PokemonCardProps) {
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
   const [showChart, setShowChart] = useState(false);
   const [showSet, setShowSet] = useState(false);
   const [setText, setSetText] = useState("");
@@ -78,6 +79,7 @@ export default function PokemonCard({
   }, [state.species]);
 
   const realAbilities = getSpeciesAbilities(state.species);
+  const lockedItemDisplay = locale === "fr" ? toFrench("item", state.item) : state.item;
   const itemGroupOf = (item: string) => t(`group.${ITEM_CATEGORY_OF(item)}`);
   const itemGroupOrder = [t("group.hold"), t("group.mega"), t("group.berry")];
   const filteredItemNames =
@@ -253,6 +255,7 @@ export default function PokemonCard({
             iconUrl={(v) => pokemonSpriteUrl(v, true)}
             isMarked={(v) => !!getMetaSet(v)}
             markedTitle={t("card.hasMetaSet")}
+            translateKind="species"
             onChange={handleSpeciesChange}
           />
           {types.length > 0 && (
@@ -266,7 +269,7 @@ export default function PokemonCard({
                   {typeIconUrl(ty) && (
                     <img src={typeIconUrl(ty)!} alt="" className="h-4 w-4 object-contain" />
                   )}
-                  {ty}
+                  {locale === "fr" ? toFrenchType(ty) : ty}
                 </span>
               ))}
               <button
@@ -314,7 +317,7 @@ export default function PokemonCard({
               {itemSpriteUrl(state.item) && (
                 <img src={itemSpriteUrl(state.item)!} alt="" className="h-6 w-6 shrink-0 object-contain" />
               )}
-              <span className="flex-1 truncate">{state.item}</span>
+              <span className="flex-1 truncate">{lockedItemDisplay}</span>
               <span aria-hidden>🔒</span>
             </div>
           </div>
@@ -329,6 +332,7 @@ export default function PokemonCard({
             valueTitle={getItemDescription(state.item)}
             groupOf={itemFilter === "all" ? itemGroupOf : undefined}
             groupOrder={itemFilter === "all" ? itemGroupOrder : undefined}
+            translateKind="item"
             onChange={(v) => update("item", v)}
           />
         )}
@@ -340,6 +344,7 @@ export default function PokemonCard({
           isPreferred={(v) => realAbilities.includes(v)}
           subtitle={(v) => getAbilityDescription(v) || undefined}
           valueTitle={getAbilityDescription(state.ability)}
+          translateKind="ability"
           onChange={(v) => update("ability", v)}
         />
         <div className="flex flex-col gap-1">
@@ -349,23 +354,21 @@ export default function PokemonCard({
             options={NATURE_NAMES}
             allowEmpty={false}
             subtitle={natureSubtitle}
+            translateKind="nature"
             onChange={(v) => update("nature", v)}
           />
           <div className="text-xs">{natureSubtitle(state.nature)}</div>
         </div>
-        <label className="flex flex-col gap-1 text-sm">
+        <div className="flex flex-col gap-1 text-sm">
           <span className="eyebrow">{t("card.levelLabel")}</span>
-          <input
-            type="number"
-            min={1}
-            max={100}
-            value={state.level}
-            onChange={(e) =>
-              update("level", Math.max(1, Math.min(100, Number(e.target.value) || 1)))
-            }
-            className="field-input tabular px-3 py-2"
-          />
-        </label>
+          <div
+            className="field-input tabular flex items-center px-3 py-2"
+            style={{ color: "var(--color-ink-dim)", cursor: "default" }}
+            title={t("card.levelFixedNote")}
+          >
+            50
+          </div>
+        </div>
       </div>
 
       <div className="mt-3 grid grid-cols-2 gap-3 border-t pt-3" style={{ borderColor: "var(--color-line)" }}>
@@ -412,7 +415,7 @@ export default function PokemonCard({
               <option value="">{t("card.teraTypePlaceholder")}</option>
               {TYPE_NAMES.map((ty) => (
                 <option key={ty} value={ty}>
-                  {ty}
+                  {locale === "fr" ? toFrenchType(ty) : ty}
                 </option>
               ))}
             </select>
@@ -497,6 +500,7 @@ export default function PokemonCard({
                 }}
                 valueTitle={getMoveDescription(m)}
                 isPreferred={(v) => moveset.has(v)}
+                translateKind="move"
                 onChange={(v) => {
                   const moves = [...state.moves];
                   moves[i] = v;

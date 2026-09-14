@@ -58,6 +58,9 @@ const CHAMPIONS_POKEDEX_RAW: string[] = [
   "Zoroark-Hisui", "Rotom-Heat", "Rotom-Mow", "Rotom-Frost", "Typhlosion-Hisui", "Decidueye-Hisui",
   "Slowking-Galar", "Slowbro-Galar", "Goodra-Hisui", "Tauros-Paldea-Aqua", "Tauros-Paldea-Blaze",
   "Basculegion-F", "Raichu-Alola", "Meowstic-F", "Avalugg-Hisui",
+  // Found via a manual cross-check against Serebii's Champions Pokédex
+  "Wigglytuff", "Farfetch'd", "Mr. Mime", "Swalot", "Thievul", "Grapploct",
+  "Perrserker", "Pincurchin", "Stunfisk-Galar",
 ];
 
 // Safety net: dedupe in case a future edit accidentally re-adds a species

@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { computeMoveResults } from "@/lib/calcEngine";
 import ResultPanel from "./ResultPanel";
 import { pokemonSpriteUrl } from "@/lib/sprites";
+import { toFrench } from "@/lib/champions/gameTranslations";
 import { useLocale } from "@/lib/i18n/LocaleContext";
 import type { FieldState, PokemonState } from "@/lib/types";
 
@@ -28,7 +29,7 @@ function cellStyle(pct: number | null): { background: string; color: string } {
 }
 
 export default function AllVsAllMatrix({ teamA, teamB, field }: AllVsAllMatrixProps) {
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
   const [selected, setSelected] = useState<{ a: number; b: number } | null>(null);
 
   const grid = useMemo(() => {
@@ -53,7 +54,7 @@ export default function AllVsAllMatrix({ teamA, teamB, field }: AllVsAllMatrixPr
                 const art = pokemonSpriteUrl(d.species, true);
                 return (
                   <th key={j} className="p-0.5">
-                    {art && <img src={art} alt="" title={d.species} className="mx-auto h-8 w-8 object-contain" />}
+                    {art && <img src={art} alt="" title={locale === "fr" ? toFrench("species", d.species) : d.species} className="mx-auto h-8 w-8 object-contain" />}
                   </th>
                 );
               })}
@@ -65,7 +66,7 @@ export default function AllVsAllMatrix({ teamA, teamB, field }: AllVsAllMatrixPr
               return (
                 <tr key={i}>
                   <td className="p-0.5">
-                    {artA && <img src={artA} alt="" title={a.species} className="h-8 w-8 object-contain" />}
+                    {artA && <img src={artA} alt="" title={locale === "fr" ? toFrench("species", a.species) : a.species} className="h-8 w-8 object-contain" />}
                   </td>
                   {teamB.map((_, j) => {
                     const pct = grid[i][j];
@@ -97,7 +98,7 @@ export default function AllVsAllMatrix({ teamA, teamB, field }: AllVsAllMatrixPr
 
       {sel && (
         <ResultPanel
-          title={`${teamA[sel.a].species} → ${teamB[sel.b].species}`}
+          title={`${locale === "fr" ? toFrench("species", teamA[sel.a].species) : teamA[sel.a].species} → ${locale === "fr" ? toFrench("species", teamB[sel.b].species) : teamB[sel.b].species}`}
           accent="league"
           results={computeMoveResults(teamA[sel.a], teamB[sel.b], field)}
           critMoves={teamA[sel.a].critMoves}

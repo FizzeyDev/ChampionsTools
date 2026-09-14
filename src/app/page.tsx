@@ -12,6 +12,7 @@ import { computeMoveResults, type MoveResult } from "@/lib/calcEngine";
 import { computeBestMoves } from "@/lib/features/bestMoves";
 import { defaultField, defaultPokemon } from "@/lib/types";
 import { autofillForSpecies } from "@/lib/features/autofillSpecies";
+import { toFrench } from "@/lib/champions/gameTranslations";
 import { syncFieldForAbilityToggle } from "@/lib/features/abilityFieldSync";
 import { buildShareUrl, readStateFromLocation } from "@/lib/shareLink";
 import { useLocale } from "@/lib/i18n/LocaleContext";
@@ -22,6 +23,7 @@ type Mode = "1v1" | "1vAll" | "Allv1" | "AllvAll" | "bestMoves" | "speedTiers";
 
 export default function Home() {
   const { locale, setLocale, t } = useLocale();
+  const speciesLabel = (s: string) => (s && locale === "fr" ? toFrench("species", s) : s);
 
   const [mode, setMode] = useState<Mode>("1v1");
   const [attacker, setAttacker] = useState(() => defaultPokemon("Abomasnow"));
@@ -160,7 +162,8 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="relative z-[1] min-h-screen">
+      <WeatherBackdrop weather={field.weather} terrain={field.terrain} />
       <header
         className="sticky top-0 z-30 w-full"
         style={{
@@ -247,7 +250,7 @@ export default function Home() {
           <>
             <div className="grid grid-cols-2 gap-2 sm:gap-5">
               <ResultPanel
-                title={`${attacker.species || t("card.attacker")} → ${defender.species || t("card.defender")}`}
+                title={`${speciesLabel(attacker.species) || t("card.attacker")} → ${speciesLabel(defender.species) || t("card.defender")}`}
                 accent="league"
                 results={forwardResults}
                 critMoves={attacker.critMoves}
@@ -257,7 +260,7 @@ export default function Home() {
                 field={field}
               />
               <ResultPanel
-                title={`${defender.species || t("card.defender")} → ${attacker.species || t("card.attacker")}`}
+                title={`${speciesLabel(defender.species) || t("card.defender")} → ${speciesLabel(attacker.species) || t("card.attacker")}`}
                 accent="brick"
                 results={backwardResults}
                 critMoves={defender.critMoves}
@@ -281,7 +284,7 @@ export default function Home() {
               {team.map((member, i) => (
                 <ResultPanel
                   key={i}
-                  title={`${attacker.species || t("card.attacker")} → ${member.species || "?"}`}
+                  title={`${speciesLabel(attacker.species) || t("card.attacker")} → ${speciesLabel(member.species) || "?"}`}
                   accent="league"
                   results={computeMoveResults(attacker, member, field)}
                   critMoves={attacker.critMoves}
@@ -309,7 +312,7 @@ export default function Home() {
               {team.map((member, i) => (
                 <ResultPanel
                   key={i}
-                  title={`${member.species || "?"} → ${defender.species || t("card.defender")}`}
+                  title={`${speciesLabel(member.species) || "?"} → ${speciesLabel(defender.species) || t("card.defender")}`}
                   accent="brick"
                   results={computeMoveResults(member, defender, field)}
                   critMoves={member.critMoves}
@@ -350,7 +353,7 @@ export default function Home() {
           <>
             <div className="grid grid-cols-2 gap-2 sm:gap-5">
               <ResultPanel
-                title={`${attacker.species || t("card.attacker")} → ${defender.species || t("card.defender")}${bestLoading ? "…" : ""}`}
+                title={`${speciesLabel(attacker.species) || t("card.attacker")} → ${speciesLabel(defender.species) || t("card.defender")}${bestLoading ? "…" : ""}`}
                 accent="league"
                 results={bestForward}
                 configurableLimit
@@ -359,7 +362,7 @@ export default function Home() {
                 field={field}
               />
               <ResultPanel
-                title={`${defender.species || t("card.defender")} → ${attacker.species || t("card.attacker")}${bestLoading ? "…" : ""}`}
+                title={`${speciesLabel(defender.species) || t("card.defender")} → ${speciesLabel(attacker.species) || t("card.attacker")}${bestLoading ? "…" : ""}`}
                 accent="brick"
                 results={bestBackward}
                 configurableLimit
@@ -392,6 +395,15 @@ export default function Home() {
 
         <footer className="flex flex-col items-center gap-1 pb-6 pt-2 text-center text-xs text-ink-dim sm:text-sm">
           <p className="max-w-2xl">{t("app.footer")}</p>
+          <a
+            href="https://github.com/fizzeydev/ChampionsTools"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-semibold underline decoration-dotted underline-offset-2"
+            style={{ color: "var(--color-league)" }}
+          >
+            {t("app.footerSource")}
+          </a>
         </footer>
       </div>
 

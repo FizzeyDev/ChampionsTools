@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { deleteSavedPokemon, getSavedPokemons, type SavedPokemon } from "@/lib/features/savedPokemon";
 import { pokemonSpriteUrl } from "@/lib/sprites";
+import { toFrench } from "@/lib/champions/gameTranslations";
 import { useLocale } from "@/lib/i18n/LocaleContext";
 import type { PokemonState } from "@/lib/types";
 
@@ -13,7 +14,7 @@ interface SavedPokemonModalProps {
 }
 
 export default function SavedPokemonModal({ open, onClose, onAssign }: SavedPokemonModalProps) {
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
   const [entries, setEntries] = useState<SavedPokemon[]>([]);
 
   useEffect(() => {
@@ -58,7 +59,11 @@ export default function SavedPokemonModal({ open, onClose, onAssign }: SavedPoke
           <div className="flex flex-col gap-2 overflow-y-auto">
             {entries.map((entry) => {
               const art = pokemonSpriteUrl(entry.state.species, true);
-              const moves = entry.state.moves.filter(Boolean).join(" · ");
+              const moves = entry.state.moves
+                .filter(Boolean)
+                .map((m) => (locale === "fr" ? toFrench("move", m) : m))
+                .join(" · ");
+              const speciesName = locale === "fr" ? toFrench("species", entry.state.species) : entry.state.species;
               return (
                 <div
                   key={entry.id}
@@ -71,7 +76,7 @@ export default function SavedPokemonModal({ open, onClose, onAssign }: SavedPoke
                       {entry.name}
                     </p>
                     <p className="truncate text-xs" style={{ color: "var(--color-ink-dim)" }}>
-                      {entry.state.species} {moves && `— ${moves}`}
+                      {speciesName} {moves && `— ${moves}`}
                     </p>
                   </div>
                   <div className="flex shrink-0 items-center gap-1.5">

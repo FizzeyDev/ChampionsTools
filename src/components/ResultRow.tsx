@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { typeIconUrl, moveInfo } from "@/lib/sprites";
 import { minSpToSurvive, minSpToOhko } from "@/lib/features/reverseCalc";
+import { toFrench } from "@/lib/champions/gameTranslations";
 import { useLocale } from "@/lib/i18n/LocaleContext";
 import type { MoveResult } from "@/lib/calcEngine";
 import type { PokemonState, FieldState } from "@/lib/types";
@@ -38,7 +39,7 @@ interface ResultRowProps {
 }
 
 export default function ResultRow({ result, attacker, defender, field }: ResultRowProps) {
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
   const { type, category } = moveInfo(result.move);
   const icon = typeIconUrl(type);
   const [activeTiers, setActiveTiers] = useState<Set<RollTier>>(new Set());
@@ -70,7 +71,7 @@ export default function ResultRow({ result, attacker, defender, field }: ResultR
         className="flex items-center justify-between rounded-[10px] px-3 py-2 text-sm"
         style={{ background: "var(--color-panel-soft)", color: "var(--color-ink-dim)" }}
       >
-        <span>{result.move}</span>
+        <span>{locale === "fr" ? toFrench("move", result.move) : result.move}</span>
         <span className="text-xs italic">{t("result.notCalculable")}</span>
       </div>
     );
@@ -119,10 +120,10 @@ export default function ResultRow({ result, attacker, defender, field }: ResultR
 
       {result.rolls && result.rolls.length > 0 && (() => {
         const sorted = [...result.rolls].sort((a, b) => a - b);
-        const lowValue = sorted[0];
+        const minValue = sorted[0];
         const maxValue = sorted[sorted.length - 1];
         const midValue = sorted[Math.floor(sorted.length / 2)];
-        const tierValue: Record<RollTier, number> = { min: lowValue, mid: midValue, max: maxValue };
+        const tierValue: Record<RollTier, number> = { min: minValue, mid: midValue, max: maxValue };
 
         return (
           <div className="mt-2">
