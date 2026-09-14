@@ -373,15 +373,6 @@ export default function Home() {
 
         <footer className="flex flex-col items-center gap-1 pb-6 pt-2 text-center text-xs text-ink-dim sm:text-sm">
           <p className="max-w-2xl">{t("app.footer")}</p>
-          <a
-            href="https://github.com/fizzeydev/ChampionsTools"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-semibold underline decoration-dotted underline-offset-2"
-            style={{ color: "var(--color-league)" }}
-          >
-            {t("app.footerSource")}
-          </a>
         </footer>
       </div>
 
