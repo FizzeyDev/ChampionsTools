@@ -6,24 +6,20 @@ import FieldBar from "@/components/FieldBar";
 import ResultPanel from "@/components/ResultPanel";
 import TeamRoster from "@/components/TeamRoster";
 import AllVsAllMatrix from "@/components/AllVsAllMatrix";
-import SpeedComparator from "@/components/SpeedComparator";
 import SavedPokemonModal from "@/components/SavedPokemonModal";
 import { computeMoveResults, type MoveResult } from "@/lib/calcEngine";
 import { computeBestMoves } from "@/lib/features/bestMoves";
 import { defaultField, defaultPokemon } from "@/lib/types";
 import { autofillForSpecies } from "@/lib/features/autofillSpecies";
-import { toFrench } from "@/lib/champions/gameTranslations";
-import { syncFieldForAbilityToggle } from "@/lib/features/abilityFieldSync";
 import { buildShareUrl, readStateFromLocation } from "@/lib/shareLink";
 import { useLocale } from "@/lib/i18n/LocaleContext";
 import { LOCALES } from "@/lib/i18n/translations";
 import type { PokemonState } from "@/lib/types";
 
-type Mode = "1v1" | "1vAll" | "Allv1" | "AllvAll" | "bestMoves" | "speedTiers";
+type Mode = "1v1" | "1vAll" | "Allv1" | "AllvAll" | "bestMoves";
 
 export default function Home() {
   const { locale, setLocale, t } = useLocale();
-  const speciesLabel = (s: string) => (s && locale === "fr" ? toFrench("species", s) : s);
 
   const [mode, setMode] = useState<Mode>("1v1");
   const [attacker, setAttacker] = useState(() => defaultPokemon("Abomasnow"));
@@ -115,21 +111,6 @@ export default function Home() {
     setDefender(attacker);
   };
 
-  // Auto-turns the matching weather/terrain on (or back off) when "ability
-  // triggered" is checked/unchecked for a Pokémon with Drought, Drizzle,
-  // Electric Surge, etc. — see abilityFieldSync.ts for the safety rules
-  // that keep this from overriding an unrelated field setup.
-  const handleAttackerChange = (next: PokemonState) => {
-    const patch = syncFieldForAbilityToggle(attacker.abilityOn, next, field);
-    if (patch) setField((f) => ({ ...f, ...patch }));
-    setAttacker(next);
-  };
-  const handleDefenderChange = (next: PokemonState) => {
-    const patch = syncFieldForAbilityToggle(defender.abilityOn, next, field);
-    if (patch) setField((f) => ({ ...f, ...patch }));
-    setDefender(next);
-  };
-
   const toggleCrit = (
     setter: (next: PokemonState) => void,
     source: PokemonState,
@@ -162,8 +143,7 @@ export default function Home() {
   };
 
   return (
-    <div className="relative z-[1] min-h-screen">
-      <WeatherBackdrop weather={field.weather} terrain={field.terrain} />
+    <div className="min-h-screen">
       <header
         className="sticky top-0 z-30 w-full"
         style={{
@@ -193,7 +173,7 @@ export default function Home() {
           <div className="flex flex-wrap items-center gap-2 px-3 pb-3 sm:px-5">
             <p className="w-full text-xs text-ink-dim">{t("app.subtitle")}</p>
             <div className="flex overflow-hidden rounded-full" style={{ border: "1px solid var(--color-line-strong)" }}>
-              {(["1v1", "1vAll", "Allv1", "AllvAll", "bestMoves", "speedTiers"] as Mode[]).map((m) => (
+              {(["1v1", "1vAll", "Allv1", "AllvAll", "bestMoves"] as Mode[]).map((m) => (
                 <button
                   key={m}
                   onClick={() => setMode(m)}
@@ -250,7 +230,7 @@ export default function Home() {
           <>
             <div className="grid grid-cols-2 gap-2 sm:gap-5">
               <ResultPanel
-                title={`${speciesLabel(attacker.species) || t("card.attacker")} → ${speciesLabel(defender.species) || t("card.defender")}`}
+                title={`${attacker.species || t("card.attacker")} → ${defender.species || t("card.defender")}`}
                 accent="league"
                 results={forwardResults}
                 critMoves={attacker.critMoves}
@@ -260,7 +240,7 @@ export default function Home() {
                 field={field}
               />
               <ResultPanel
-                title={`${speciesLabel(defender.species) || t("card.defender")} → ${speciesLabel(attacker.species) || t("card.attacker")}`}
+                title={`${defender.species || t("card.defender")} → ${attacker.species || t("card.attacker")}`}
                 accent="brick"
                 results={backwardResults}
                 critMoves={defender.critMoves}
@@ -271,9 +251,9 @@ export default function Home() {
               />
             </div>
             <div className="grid gap-5 xl:grid-cols-[0.85fr_560px_0.85fr]">
-              <PokemonCard role="attacker" accent="league" state={attacker} onChange={handleAttackerChange} />
+              <PokemonCard role="attacker" accent="league" state={attacker} onChange={setAttacker} />
               <FieldBar state={field} onChange={setField} />
-              <PokemonCard role="defender" accent="brick" state={defender} onChange={handleDefenderChange} />
+              <PokemonCard role="defender" accent="brick" state={defender} onChange={setDefender} />
             </div>
           </>
         )}
@@ -284,7 +264,7 @@ export default function Home() {
               {team.map((member, i) => (
                 <ResultPanel
                   key={i}
-                  title={`${speciesLabel(attacker.species) || t("card.attacker")} → ${speciesLabel(member.species) || "?"}`}
+                  title={`${attacker.species || t("card.attacker")} → ${member.species || "?"}`}
                   accent="league"
                   results={computeMoveResults(attacker, member, field)}
                   critMoves={attacker.critMoves}
@@ -299,7 +279,7 @@ export default function Home() {
               )}
             </div>
             <div className="grid gap-5 xl:grid-cols-[0.85fr_560px_0.85fr]">
-              <PokemonCard role="attacker" accent="league" state={attacker} onChange={handleAttackerChange} />
+              <PokemonCard role="attacker" accent="league" state={attacker} onChange={setAttacker} />
               <FieldBar state={field} onChange={setField} />
               <TeamRoster team={team} onChange={setTeam} accent="brick" maxSize={maxTeamSize} />
             </div>
@@ -312,7 +292,7 @@ export default function Home() {
               {team.map((member, i) => (
                 <ResultPanel
                   key={i}
-                  title={`${speciesLabel(member.species) || "?"} → ${speciesLabel(defender.species) || t("card.defender")}`}
+                  title={`${member.species || "?"} → ${defender.species || t("card.defender")}`}
                   accent="brick"
                   results={computeMoveResults(member, defender, field)}
                   critMoves={member.critMoves}
@@ -329,7 +309,7 @@ export default function Home() {
             <div className="grid gap-5 xl:grid-cols-[0.85fr_560px_0.85fr]">
               <TeamRoster team={team} onChange={setTeam} accent="league" maxSize={maxTeamSize} />
               <FieldBar state={field} onChange={setField} />
-              <PokemonCard role="defender" accent="brick" state={defender} onChange={handleDefenderChange} />
+              <PokemonCard role="defender" accent="brick" state={defender} onChange={setDefender} />
             </div>
           </>
         )}
@@ -347,13 +327,11 @@ export default function Home() {
           </>
         )}
 
-        {mode === "speedTiers" && <SpeedComparator />}
-
         {mode === "bestMoves" && (
           <>
             <div className="grid grid-cols-2 gap-2 sm:gap-5">
               <ResultPanel
-                title={`${speciesLabel(attacker.species) || t("card.attacker")} → ${speciesLabel(defender.species) || t("card.defender")}${bestLoading ? "…" : ""}`}
+                title={`${attacker.species || t("card.attacker")} → ${defender.species || t("card.defender")}${bestLoading ? "…" : ""}`}
                 accent="league"
                 results={bestForward}
                 configurableLimit
@@ -362,7 +340,7 @@ export default function Home() {
                 field={field}
               />
               <ResultPanel
-                title={`${speciesLabel(defender.species) || t("card.defender")} → ${speciesLabel(attacker.species) || t("card.attacker")}${bestLoading ? "…" : ""}`}
+                title={`${defender.species || t("card.defender")} → ${attacker.species || t("card.attacker")}${bestLoading ? "…" : ""}`}
                 accent="brick"
                 results={bestBackward}
                 configurableLimit
@@ -376,7 +354,7 @@ export default function Home() {
                 role="attacker"
                 accent="league"
                 state={attacker}
-                onChange={handleAttackerChange}
+                onChange={setAttacker}
                 showMoves={false}
                 restrictAbilityToReal
               />
@@ -385,7 +363,7 @@ export default function Home() {
                 role="defender"
                 accent="brick"
                 state={defender}
-                onChange={handleDefenderChange}
+                onChange={setDefender}
                 showMoves={false}
                 restrictAbilityToReal
               />
