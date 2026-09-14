@@ -1,4 +1,5 @@
 import { calculate, Pokemon, Move, Field } from "@smogon/calc";
+import { getModifiedStat } from "@smogon/calc/dist/mechanics/util";
 import { champGen } from "./champions/megaSpecies";
 import type { FieldState, PokemonState } from "./types";
 
@@ -47,9 +48,21 @@ export function buildField(field: FieldState) {
   });
 }
 
-/** Actual in-battle stats (base + EV/IV/nature/level/boosts applied). */
+/** Actual in-battle stats (base + EV/IV/nature/level applied, AND stage
+ * boosts/drops — @smogon/calc's own `.stats` getter is the *raw*,
+ * pre-stage number; the stage multiplier only gets applied ad-hoc deep
+ * inside the damage calc itself, which is no good for just showing "what's
+ * this Pokémon's stat right now" on the card). */
 export function computeStats(state: PokemonState) {
-  return buildPokemon(state).stats;
+  const pokemon = buildPokemon(state);
+  const stats = { ...pokemon.stats };
+  for (const key of ["hp", "atk", "def", "spa", "spd", "spe"] as const) {
+    const boost = state.boosts[key] ?? 0;
+    if (boost !== 0) {
+      stats[key] = getModifiedStat(pokemon.rawStats[key], boost);
+    }
+  }
+  return stats;
 }
 
 export function computeMoveResults(

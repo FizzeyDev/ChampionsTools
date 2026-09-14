@@ -6,6 +6,7 @@ import FieldBar from "@/components/FieldBar";
 import ResultPanel from "@/components/ResultPanel";
 import TeamRoster from "@/components/TeamRoster";
 import AllVsAllMatrix from "@/components/AllVsAllMatrix";
+import SpeedComparator from "@/components/SpeedComparator";
 import SavedPokemonModal from "@/components/SavedPokemonModal";
 import { computeMoveResults, type MoveResult } from "@/lib/calcEngine";
 import { computeBestMoves } from "@/lib/features/bestMoves";
@@ -16,7 +17,7 @@ import { useLocale } from "@/lib/i18n/LocaleContext";
 import { LOCALES } from "@/lib/i18n/translations";
 import type { PokemonState } from "@/lib/types";
 
-type Mode = "1v1" | "1vAll" | "Allv1" | "AllvAll" | "bestMoves";
+type Mode = "1v1" | "1vAll" | "Allv1" | "AllvAll" | "bestMoves" | "speedTiers";
 
 export default function Home() {
   const { locale, setLocale, t } = useLocale();
@@ -173,7 +174,7 @@ export default function Home() {
           <div className="flex flex-wrap items-center gap-2 px-3 pb-3 sm:px-5">
             <p className="w-full text-xs text-ink-dim">{t("app.subtitle")}</p>
             <div className="flex overflow-hidden rounded-full" style={{ border: "1px solid var(--color-line-strong)" }}>
-              {(["1v1", "1vAll", "Allv1", "AllvAll", "bestMoves"] as Mode[]).map((m) => (
+              {(["1v1", "1vAll", "Allv1", "AllvAll", "bestMoves", "speedTiers"] as Mode[]).map((m) => (
                 <button
                   key={m}
                   onClick={() => setMode(m)}
@@ -326,6 +327,8 @@ export default function Home() {
             </div>
           </>
         )}
+
+        {mode === "speedTiers" && <SpeedComparator />}
 
         {mode === "bestMoves" && (
           <>

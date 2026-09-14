@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import IconSearchSelect from "./IconSearchSelect";
 import SpeedTierRow from "./SpeedTierRow";
 import { pokemonSpriteUrl } from "@/lib/sprites";
@@ -48,13 +48,37 @@ export default function SpeedComparator() {
   const setConfig = (species: string, next: SpeedRowConfig) =>
     setRowConfigs((prev) => ({ ...prev, [species]: next }));
 
+  // Row ORDER is intentionally not recomputed on every keystroke — only
+  // when the comparison set itself changes (mode/count/reference/manual
+  // add-remove) or Trick Room is toggled, both deliberate actions. Without
+  // this, editing one row's slider would make it jump around the list on
+  // every change since it's now faster/slower, which makes it impossible
+  // to keep adjusting the same row. Tweaking a row's own values only
+  // re-sorts once you hit "Update order" below.
+  const [order, setOrder] = useState<string[]>([]);
+
+  const sortNow = () => {
+    setOrder(
+      [...comparisonSpecies].sort((a, b) => {
+        const sa = computeRowSpeed(getConfig(a));
+        const sb = computeRowSpeed(getConfig(b));
+        return trickRoom ? sa - sb : sb - sa;
+      })
+    );
+  };
+
+  useEffect(() => {
+    sortNow();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [comparisonSpecies, trickRoom]);
+
   const refSpeed = computeRowSpeed(refConfig);
-  const rows = comparisonSpecies
+  const rows = order
+    .filter((species) => comparisonSpecies.includes(species))
     .map((species) => {
       const config = getConfig(species);
       return { species, config, speed: computeRowSpeed(config) };
-    })
-    .sort((a, b) => (trickRoom ? a.speed - b.speed : b.speed - a.speed));
+    });
 
   return (
     <div className="flex flex-col gap-4">
@@ -123,6 +147,16 @@ export default function SpeedComparator() {
             }
           >
             {t("speed.trickRoom")}
+          </button>
+
+          <button
+            type="button"
+            onClick={sortNow}
+            className="pill-btn"
+            title={t("speed.updateOrderHint")}
+            style={{ color: "var(--color-amber)", borderColor: "rgba(255,215,64,0.4)", background: "var(--color-amber-soft)" }}
+          >
+            🔄 {t("speed.updateOrder")}
           </button>
         </div>
 
