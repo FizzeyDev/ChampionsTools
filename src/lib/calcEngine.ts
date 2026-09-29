@@ -1,5 +1,5 @@
 import { calculate, Pokemon, Move, Field } from "@smogon/calc";
-import { getModifiedStat } from "@smogon/calc/dist/mechanics/util";
+import { getModifiedStat, getFinalSpeed } from "@smogon/calc/dist/mechanics/util";
 import { champGen } from "./champions/megaSpecies";
 import type { FieldState, PokemonState } from "./types";
 
@@ -52,13 +52,27 @@ export function buildField(field: FieldState) {
  * boosts/drops — @smogon/calc's own `.stats` getter is the *raw*,
  * pre-stage number; the stage multiplier only gets applied ad-hoc deep
  * inside the damage calc itself, which is no good for just showing "what's
- * this Pokémon's stat right now" on the card). */
-export function computeStats(state: PokemonState) {
+ * this Pokémon's stat right now" on the card).
+ *
+ * Speed is special-cased: stage boosts alone don't capture item/ability/
+ * weather/Tailwind/paralysis modifiers (Choice Scarf, Swift Swim, etc.),
+ * so whenever field context is available we run the same `getFinalSpeed`
+ * the real damage calc uses internally, instead of just stage-modifying
+ * the raw stat. Without field context (e.g. a roster card with no battle
+ * side to reference) we fall back to the stage-only number. */
+export function computeStats(
+  state: PokemonState,
+  field?: FieldState,
+  sideKey: "attackerSide" | "defenderSide" = "attackerSide"
+) {
   const pokemon = buildPokemon(state);
   const stats = { ...pokemon.stats };
   for (const key of ["hp", "atk", "def", "spa", "spd", "spe"] as const) {
     const boost = state.boosts[key] ?? 0;
-    if (boost !== 0) {
+    if (key === "spe" && field) {
+      const f = buildField(field);
+      stats.spe = getFinalSpeed(champGen, pokemon, f, f[sideKey]);
+    } else if (boost !== 0) {
       stats[key] = getModifiedStat(pokemon.rawStats[key], boost);
     }
   }

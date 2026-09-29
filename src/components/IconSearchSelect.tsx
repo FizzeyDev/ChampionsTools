@@ -11,7 +11,17 @@ interface Option {
   marked?: boolean;
 }
 
-type Row = { kind: "header"; label: string } | { kind: "option"; opt: Option };
+interface ExtraGroupItem {
+  id: string;
+  label: string;
+  subtitle?: ReactNode;
+  icon?: string | null;
+}
+
+type Row =
+  | { kind: "header"; label: string }
+  | { kind: "option"; opt: Option }
+  | { kind: "extra"; item: ExtraGroupItem };
 
 interface IconSearchSelectProps {
   label: string;
@@ -43,6 +53,17 @@ interface IconSearchSelectProps {
    * searching matches either language regardless of the current locale
    * (e.g. typing "Sarmurai" finds Golisopod even in the English UI). */
   translateKind?: "species" | "move" | "ability" | "item" | "nature";
+  /** An extra, separately-matched section shown above everything else while
+   * actively searching (e.g. the person's own saved Pokémon builds, matched
+   * by their custom name — "Absol Z" — rather than the species list this
+   * field otherwise searches). Selecting one calls `onSelect(id)` instead
+   * of the normal `onChange`, since picking a save usually needs to load
+   * more than just this one field's value. */
+  extraGroup?: {
+    heading: string;
+    items: ExtraGroupItem[];
+    onSelect: (id: string) => void;
+  };
 }
 
 export default function IconSearchSelect({
@@ -62,6 +83,7 @@ export default function IconSearchSelect({
   markedTitle,
   valueTitle,
   translateKind,
+  extraGroup,
 }: IconSearchSelectProps) {
   const { t, locale } = useLocale();
   const [query, setQuery] = useState(value);
@@ -82,10 +104,22 @@ export default function IconSearchSelect({
       ? options.filter((o) => (translateKind ? matchesBilingual(translateKind, o, q) : o.toLowerCase().includes(q.toLowerCase())))
       : options;
 
+    // Saved builds (or similar) matched by their own custom name, shown
+    // above the normal list only while actively typing — otherwise every
+    // field would open cluttered with them at rest.
+    const extraRows: Row[] = [];
+    if (extraGroup && q) {
+      const matches = extraGroup.items.filter((it) => it.label.toLowerCase().includes(q.toLowerCase()));
+      if (matches.length) {
+        extraRows.push({ kind: "header", label: extraGroup.heading });
+        for (const it of matches.slice(0, 8)) extraRows.push({ kind: "extra", item: it });
+      }
+    }
+
     if (isPreferred) {
       const preferred = matched.filter((v) => isPreferred(v)).slice(0, 40);
       const rest = matched.filter((v) => !isPreferred(v)).slice(0, 40);
-      const out: Row[] = [];
+      const out: Row[] = [...extraRows];
       if (preferred.length) {
         out.push({ kind: "header", label: preferredLabel ?? t("select.preferred") });
         for (const v of preferred) out.push({ kind: "option", opt: { value: v, subtitle: subtitle?.(v), preferred: true, marked: isMarked?.(v) } });
@@ -103,7 +137,7 @@ export default function IconSearchSelect({
         buckets.get(g)!.push(v);
       }
       const order = groupOrder ?? [...buckets.keys()];
-      const out: Row[] = [];
+      const out: Row[] = [...extraRows];
       let shown = 0;
       for (const g of order) {
         const vals = buckets.get(g);
@@ -118,10 +152,14 @@ export default function IconSearchSelect({
       return out;
     }
 
-    return matched.slice(0, 60).map((v) => ({ kind: "option" as const, opt: { value: v, subtitle: subtitle?.(v), marked: isMarked?.(v) } }));
-  }, [query, options, subtitle, isPreferred, preferredLabel, groupOf, groupOrder, isMarked, translateKind, t]);
+    return [...extraRows, ...matched.slice(0, 60).map((v) => ({ kind: "option" as const, opt: { value: v, subtitle: subtitle?.(v), marked: isMarked?.(v) } }))];
+  }, [query, options, subtitle, isPreferred, preferredLabel, groupOf, groupOrder, isMarked, translateKind, extraGroup, t]);
 
-  const optionRows = rows.filter((r): r is { kind: "option"; opt: Option } => r.kind === "option");
+  // Both real options AND extra-group items are keyboard-navigable/clickable rows.
+  const optionRows = rows.filter(
+    (r): r is { kind: "option"; opt: Option } | { kind: "extra"; item: ExtraGroupItem } =>
+      r.kind === "option" || r.kind === "extra"
+  );
 
   const commit = (v: string) => {
     onChange(v);
@@ -168,9 +206,15 @@ export default function IconSearchSelect({
               setHighlight((h) => Math.max(h - 1, 0));
             } else if (e.key === "Enter") {
               e.preventDefault();
-              const opt = optionRows[highlight];
-              if (opt) commit(opt.opt.value);
-              else if (allowEmpty && query.trim() === "") commit("");
+              const row = optionRows[highlight];
+              if (row?.kind === "extra") {
+                extraGroup?.onSelect(row.item.id);
+                setOpen(false);
+              } else if (row?.kind === "option") {
+                commit(row.opt.value);
+              } else if (allowEmpty && query.trim() === "") {
+                commit("");
+              }
             } else if (e.key === "Escape") {
               setOpen(false);
               setQuery(displayName(value));
@@ -221,6 +265,48 @@ export default function IconSearchSelect({
               }
               optionIndex++;
               const idx = optionIndex;
+
+              if (row.kind === "extra") {
+                const item = row.item;
+                return (
+                  <button
+                    type="button"
+                    key={`extra-${item.id}`}
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => {
+                      extraGroup?.onSelect(item.id);
+                      setOpen(false);
+                    }}
+                    className="flex w-full items-center gap-2 px-2 py-1.5 text-left text-sm"
+                    style={{
+                      background: idx === highlight ? "var(--color-amber-soft)" : "transparent",
+                      color: "var(--color-ink)",
+                      borderLeft: "2px solid var(--color-amber)",
+                    }}
+                  >
+                    {item.icon && (
+                      <img
+                        src={item.icon}
+                        alt=""
+                        className="h-7 w-7 shrink-0 object-contain"
+                        onError={(e) => ((e.target as HTMLImageElement).style.visibility = "hidden")}
+                      />
+                    )}
+                    <span className="flex flex-1 flex-col leading-tight">
+                      <span>{item.label}</span>
+                      {item.subtitle && (
+                        <span className="text-xs" style={{ color: "var(--color-ink-dim)" }}>
+                          {item.subtitle}
+                        </span>
+                      )}
+                    </span>
+                    <span className="shrink-0 text-xs" style={{ color: "var(--color-amber)" }}>
+                      ★
+                    </span>
+                  </button>
+                );
+              }
+
               const opt = row.opt;
               return (
                 <button

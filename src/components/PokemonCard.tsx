@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ABILITY_NAMES,
   ITEM_NAMES,
@@ -13,7 +13,7 @@ import {
 } from "@/lib/gen";
 import { itemSpriteUrl, moveInfo, pokemonSpriteUrl, speciesTypes, typeIconUrl } from "@/lib/sprites";
 import { exportShowdownSet, parseShowdownSet } from "@/lib/showdownSet";
-import { savePokemon } from "@/lib/features/savedPokemon";
+import { getSavedPokemons, savePokemon } from "@/lib/features/savedPokemon";
 import { STAT_POINT_BUDGET, evToSp } from "@/lib/champions/statPoints";
 import { computeStats } from "@/lib/calcEngine";
 import { getBaseStats } from "@/lib/champions/baseStats";
@@ -27,7 +27,7 @@ import { getItemCategory, ITEM_CATEGORY_ORDER, type ItemCategory } from "@/lib/c
 import { HOLD_ITEMS, MEGA_STONES, NEW_MEGA_STONES, BERRIES } from "@/lib/champions/items";
 import { NATURE_EFFECTS, natureStatAbbr } from "@/lib/natures";
 import { useLocale } from "@/lib/i18n/LocaleContext";
-import type { PokemonState } from "@/lib/types";
+import type { FieldState, PokemonState } from "@/lib/types";
 import IconSearchSelect from "./IconSearchSelect";
 import StatRow from "./StatRow";
 import TypeChart from "./TypeChart";
@@ -47,6 +47,14 @@ interface PokemonCardProps {
   onChange: (next: PokemonState) => void;
   showMoves?: boolean;
   restrictAbilityToReal?: boolean;
+  /** Battle field, so the Speed row can reflect item/ability/weather/
+   * Tailwind modifiers (Choice Scarf, Swift Swim, etc.), not just stage
+   * boosts. Optional — cards used outside a battle context (roster slots)
+   * simply fall back to the stage-only Speed number. */
+  field?: FieldState;
+  /** Which side's field flags (Tailwind, etc.) apply to this Pokémon.
+   * Defaults to the field's attacker side when omitted. */
+  sideKey?: "attackerSide" | "defenderSide";
 }
 
 export default function PokemonCard({
@@ -56,6 +64,8 @@ export default function PokemonCard({
   onChange,
   showMoves = true,
   restrictAbilityToReal = false,
+  field,
+  sideKey,
 }: PokemonCardProps) {
   const { t, locale } = useLocale();
   const [showChart, setShowChart] = useState(false);
@@ -67,6 +77,14 @@ export default function PokemonCard({
   const [savedFlash, setSavedFlash] = useState(false);
   const [moveset, setMoveset] = useState<Set<string>>(new Set());
   const [itemFilter, setItemFilter] = useState<ItemCategory | "all">("all");
+  const [savedList, setSavedList] = useState<ReturnType<typeof getSavedPokemons>>([]);
+
+  // Loaded once on mount (client-only, reads localStorage) and refreshed
+  // right after a save so the species search's "your saves" section stays
+  // current without needing the ★ Saved modal to be opened first.
+  useEffect(() => {
+    setSavedList(getSavedPokemons());
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -92,9 +110,18 @@ export default function PokemonCard({
   const update = <K extends keyof PokemonState>(key: K, value: PokemonState[K]) =>
     onChange({ ...state, [key]: value });
 
-  /** Auto-fills ability, moves and (for Megas) held item when the species changes. */
+  /** Auto-fills ability, moves and (for Megas) held item when the species
+   * changes. Guarded with a request token: autofillForSpecies awaits a
+   * moveset lookup, and without this guard a slow first lookup could
+   * resolve *after* a second, faster species switch and clobber it with
+   * stale data built from the old `state` closure — the "spreads get
+   * mixed up between two Pokémon" bug. */
+  const speciesRequestRef = useRef(0);
   const handleSpeciesChange = async (newSpecies: string) => {
-    onChange(await autofillForSpecies(state, newSpecies));
+    const requestId = ++speciesRequestRef.current;
+    const next = await autofillForSpecies(state, newSpecies);
+    if (speciesRequestRef.current !== requestId) return;
+    onChange(next);
   };
 
   const artwork = pokemonSpriteUrl(state.species);
@@ -102,7 +129,7 @@ export default function PokemonCard({
   const totalSp = STAT_KEYS.reduce((sum, key) => sum + evToSp(state.evs[key]), 0);
   let stats: Record<string, number>;
   try {
-    stats = computeStats(state);
+    stats = computeStats(state, field, sideKey ?? (role === "defender" ? "defenderSide" : "attackerSide"));
   } catch {
     stats = { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 };
   }
@@ -147,10 +174,18 @@ export default function PokemonCard({
 
   const confirmSave = () => {
     savePokemon(saveName || state.species, state);
+    setSavedList(getSavedPokemons());
     setShowSavePrompt(false);
     setSaveName("");
     setSavedFlash(true);
     window.setTimeout(() => setSavedFlash(false), 1500);
+  };
+
+  const selectSaved = (id: string) => {
+    const entry = savedList.find((e) => e.id === id);
+    if (!entry) return;
+    // Deep-clone so later edits on the card don't mutate the saved copy.
+    onChange(JSON.parse(JSON.stringify(entry.state)));
   };
 
   return (
@@ -257,6 +292,20 @@ export default function PokemonCard({
             markedTitle={t("card.hasMetaSet")}
             translateKind="species"
             onChange={handleSpeciesChange}
+            extraGroup={
+              savedList.length
+                ? {
+                    heading: t("saved.searchHeading"),
+                    items: savedList.map((entry) => ({
+                      id: entry.id,
+                      label: entry.name,
+                      subtitle: locale === "fr" ? toFrench("species", entry.state.species) : entry.state.species,
+                      icon: pokemonSpriteUrl(entry.state.species, true),
+                    })),
+                    onSelect: selectSaved,
+                  }
+                : undefined
+            }
           />
           {types.length > 0 && (
             <div className="mt-1.5 flex flex-wrap items-center gap-1.5">

@@ -24,6 +24,7 @@ export default function TeamRoster({ team, onChange, accent, maxSize }: TeamRost
   const [showImport, setShowImport] = useState(team.length === 0);
   const [teamText, setTeamText] = useState("");
   const [importError, setImportError] = useState("");
+  const [adding, setAdding] = useState(false);
 
   const accentVar = accent === "league" ? "var(--color-league)" : "var(--color-brick)";
 
@@ -40,11 +41,17 @@ export default function TeamRoster({ team, onChange, accent, maxSize }: TeamRost
     setTeamText("");
   };
 
+  // Guarded against double-clicks: this awaits a moveset lookup, and
+  // without the guard two fast clicks both capture the same pre-update
+  // `team` array and race to set it — the second onChange(...) silently
+  // overwrites the first, so one of the two added slots is lost.
   const addSlot = async () => {
-    if (team.length >= maxSize) return;
+    if (team.length >= maxSize || adding) return;
+    setAdding(true);
     const newMember = await autofillForSpecies(defaultPokemon("Abomasnow"), "Abomasnow");
     onChange([...team, newMember]);
     setActiveIndex(team.length);
+    setAdding(false);
   };
 
   const removeSlot = (i: number) => {
@@ -129,7 +136,8 @@ export default function TeamRoster({ team, onChange, accent, maxSize }: TeamRost
           <button
             type="button"
             onClick={addSlot}
-            className="flex h-[3.6rem] w-[3.6rem] items-center justify-center rounded-[8px] text-lg"
+            disabled={adding}
+            className="flex h-[3.6rem] w-[3.6rem] items-center justify-center rounded-[8px] text-lg disabled:opacity-50"
             style={{ border: "1px dashed var(--color-line-strong)", color: "var(--color-ink-dim)" }}
           >
             +

@@ -7,7 +7,9 @@ import ResultPanel from "@/components/ResultPanel";
 import TeamRoster from "@/components/TeamRoster";
 import AllVsAllMatrix from "@/components/AllVsAllMatrix";
 import SpeedComparator from "@/components/SpeedComparator";
+import MoveComparator from "@/components/MoveComparator";
 import SavedPokemonModal from "@/components/SavedPokemonModal";
+import ChangelogModal from "@/components/ChangelogModal";
 import { computeMoveResults, type MoveResult } from "@/lib/calcEngine";
 import { computeBestMoves } from "@/lib/features/bestMoves";
 import { defaultField, defaultPokemon } from "@/lib/types";
@@ -17,7 +19,7 @@ import { useLocale } from "@/lib/i18n/LocaleContext";
 import { LOCALES } from "@/lib/i18n/translations";
 import type { PokemonState } from "@/lib/types";
 
-type Mode = "1v1" | "1vAll" | "Allv1" | "AllvAll" | "bestMoves" | "speedTiers";
+type Mode = "1v1" | "1vAll" | "Allv1" | "AllvAll" | "bestMoves" | "speedTiers" | "moveComparator";
 
 export default function Home() {
   const { locale, setLocale, t } = useLocale();
@@ -30,6 +32,7 @@ export default function Home() {
   const [field, setField] = useState(defaultField);
   const [copied, setCopied] = useState(false);
   const [showSaved, setShowSaved] = useState(false);
+  const [showChangelog, setShowChangelog] = useState(false);
   const [bestForward, setBestForward] = useState<MoveResult[]>([]);
   const [bestBackward, setBestBackward] = useState<MoveResult[]>([]);
   const [bestLoading, setBestLoading] = useState(false);
@@ -159,10 +162,13 @@ export default function Home() {
           >
             {t("app.title")}
           </h1>
+          {/* Collapsing the header is a small-screen space-saver — desktop
+              has plenty of room, so the toggle (and the collapsed state
+              itself) only applies below the sm breakpoint. */}
           <button
             type="button"
             onClick={toggleHeader}
-            className="shrink-0 rounded-full px-2 py-1 text-xs"
+            className="shrink-0 rounded-full px-2 py-1 text-xs sm:hidden"
             style={{ border: "1px solid var(--color-line-strong)", color: "var(--color-ink-dim)" }}
             title={headerCollapsed ? t("app.showHeader") : t("app.hideHeader")}
           >
@@ -170,11 +176,11 @@ export default function Home() {
           </button>
         </div>
 
-        {!headerCollapsed && (
-          <div className="flex flex-wrap items-center gap-2 px-3 pb-3 sm:px-5">
+        {
+          <div className={`${headerCollapsed ? "hidden sm:flex" : "flex"} flex-wrap items-center gap-2 px-3 pb-3 sm:px-5`}>
             <p className="w-full text-xs text-ink-dim">{t("app.subtitle")}</p>
             <div className="flex overflow-hidden rounded-full" style={{ border: "1px solid var(--color-line-strong)" }}>
-              {(["1v1", "1vAll", "Allv1", "AllvAll", "bestMoves", "speedTiers"] as Mode[]).map((m) => (
+              {(["1v1", "1vAll", "Allv1", "AllvAll", "bestMoves", "speedTiers", "moveComparator"] as Mode[]).map((m) => (
                 <button
                   key={m}
                   onClick={() => setMode(m)}
@@ -213,6 +219,13 @@ export default function Home() {
             >
               ★ {t("saved.viewButton")}
             </button>
+            <button
+              onClick={() => setShowChangelog(true)}
+              className="pill-btn"
+              style={{ color: "var(--color-success)", borderColor: "rgba(76,175,130,0.4)", background: "var(--color-success-soft)" }}
+            >
+              🕒 {t("changelog.viewButton")}
+            </button>
             {(mode === "1v1" || mode === "bestMoves") && (
               <button
                 onClick={swap}
@@ -223,7 +236,7 @@ export default function Home() {
               </button>
             )}
           </div>
-        )}
+        }
       </header>
 
       <div className="mx-auto flex w-full max-w-[1600px] flex-col gap-5 px-4 py-6 sm:px-6">
@@ -252,9 +265,23 @@ export default function Home() {
               />
             </div>
             <div className="grid gap-5 xl:grid-cols-[0.85fr_560px_0.85fr]">
-              <PokemonCard role="attacker" accent="league" state={attacker} onChange={setAttacker} />
+              <PokemonCard
+                role="attacker"
+                accent="league"
+                state={attacker}
+                onChange={setAttacker}
+                field={field}
+                sideKey="attackerSide"
+              />
               <FieldBar state={field} onChange={setField} />
-              <PokemonCard role="defender" accent="brick" state={defender} onChange={setDefender} />
+              <PokemonCard
+                role="defender"
+                accent="brick"
+                state={defender}
+                onChange={setDefender}
+                field={field}
+                sideKey="defenderSide"
+              />
             </div>
           </>
         )}
@@ -280,7 +307,14 @@ export default function Home() {
               )}
             </div>
             <div className="grid gap-5 xl:grid-cols-[0.85fr_560px_0.85fr]">
-              <PokemonCard role="attacker" accent="league" state={attacker} onChange={setAttacker} />
+              <PokemonCard
+                role="attacker"
+                accent="league"
+                state={attacker}
+                onChange={setAttacker}
+                field={field}
+                sideKey="attackerSide"
+              />
               <FieldBar state={field} onChange={setField} />
               <TeamRoster team={team} onChange={setTeam} accent="brick" maxSize={maxTeamSize} />
             </div>
@@ -310,7 +344,14 @@ export default function Home() {
             <div className="grid gap-5 xl:grid-cols-[0.85fr_560px_0.85fr]">
               <TeamRoster team={team} onChange={setTeam} accent="league" maxSize={maxTeamSize} />
               <FieldBar state={field} onChange={setField} />
-              <PokemonCard role="defender" accent="brick" state={defender} onChange={setDefender} />
+              <PokemonCard
+                role="defender"
+                accent="brick"
+                state={defender}
+                onChange={setDefender}
+                field={field}
+                sideKey="defenderSide"
+              />
             </div>
           </>
         )}
@@ -329,6 +370,8 @@ export default function Home() {
         )}
 
         {mode === "speedTiers" && <SpeedComparator />}
+
+        {mode === "moveComparator" && <MoveComparator />}
 
         {mode === "bestMoves" && (
           <>
@@ -360,6 +403,8 @@ export default function Home() {
                 onChange={setAttacker}
                 showMoves={false}
                 restrictAbilityToReal
+                field={field}
+                sideKey="attackerSide"
               />
               <FieldBar state={field} onChange={setField} />
               <PokemonCard
@@ -369,6 +414,8 @@ export default function Home() {
                 onChange={setDefender}
                 showMoves={false}
                 restrictAbilityToReal
+                field={field}
+                sideKey="defenderSide"
               />
             </div>
           </>
@@ -387,6 +434,7 @@ export default function Home() {
           else setDefender(pkm);
         }}
       />
+      <ChangelogModal forceOpen={showChangelog} onForceClose={() => setShowChangelog(false)} />
     </div>
   );
 }
