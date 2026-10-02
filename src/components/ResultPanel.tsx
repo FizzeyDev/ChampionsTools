@@ -91,7 +91,7 @@ export default function ResultPanel({
                   boxShadow: isActive ? `0 0 16px ${accent === "league" ? "var(--color-league-glow)" : "var(--color-brick-glow)"}` : "none",
                 }}
               >
-                {icon && <img src={icon} alt="" className="h-4 w-4 shrink-0 object-contain" />}
+                {icon && <img src={icon} alt="" className="h-5 w-5 shrink-0 object-contain" />}
                 <span className="flex-1 truncate text-left">{locale === "fr" ? toFrench("move", r.move) : r.move}</span>
                 {onToggleCrit && (
                   <button

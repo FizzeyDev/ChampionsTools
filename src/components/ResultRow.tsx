@@ -1,7 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { typeIconUrl, moveInfo } from "@/lib/sprites";
+import { moveInfo } from "@/lib/sprites";
+import TypeBadge from "./TypeBadge";
 import { minSpToSurvive, minSpToOhko } from "@/lib/features/reverseCalc";
 import { toFrench } from "@/lib/champions/gameTranslations";
 import { useLocale } from "@/lib/i18n/LocaleContext";
@@ -41,7 +42,6 @@ interface ResultRowProps {
 export default function ResultRow({ result, attacker, defender, field }: ResultRowProps) {
   const { t, locale } = useLocale();
   const { type, category } = moveInfo(result.move);
-  const icon = typeIconUrl(type);
   const [activeTiers, setActiveTiers] = useState<Set<RollTier>>(new Set());
 
   const toggleTier = (tier: RollTier) => {
@@ -90,7 +90,7 @@ export default function ResultRow({ result, attacker, defender, field }: ResultR
       {/* Showdown-style damage line, e.g. "252+ Atk Absol Life Orb Sucker Punch
           vs. 252 HP / 0 Def Chansey: 99-117 (14.1 - 16.6%) -- possible 7HKO" */}
       <div className="flex items-start gap-1.5">
-        {icon && <img src={icon} alt="" className="mt-0.5 h-5 w-5 shrink-0 object-contain" />}
+        {type && <TypeBadge type={type} size="sm" />}
         <p className="tabular text-sm leading-snug" style={{ color: "var(--color-ink-bright)" }}>
           {result.description}
         </p>

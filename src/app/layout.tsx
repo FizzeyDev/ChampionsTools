@@ -3,8 +3,8 @@ import "./globals.css";
 import { LocaleProvider } from "@/lib/i18n/LocaleContext";
 
 export const metadata: Metadata = {
-  title: "Champions Calculator",
-  description: "Damage calculator built for the Pokémon Champions format.",
+  title: "Champions Tools",
+  description: "Damage calculator and tools built for the Pokémon Champions format.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

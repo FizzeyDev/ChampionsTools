@@ -9,35 +9,38 @@ const SPRITES_BASE = "https://raw.githubusercontent.com/PokeAPI/sprites/master/s
 // build time — see next.config.ts.
 const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
-// Official game type IDs (Normal…Stellar), used by the sprites repo's
-// generation-ix/scarlet-violet type icon set.
-const TYPE_IDS: Record<string, number> = {
-  Normal: 1,
-  Fighting: 2,
-  Flying: 3,
-  Poison: 4,
-  Ground: 5,
-  Rock: 6,
-  Bug: 7,
-  Ghost: 8,
-  Steel: 9,
-  Fire: 10,
-  Water: 11,
-  Grass: 12,
-  Electric: 13,
-  Psychic: 14,
-  Ice: 15,
-  Dragon: 16,
-  Dark: 17,
-  Fairy: 18,
-  Stellar: 19,
-};
+// Round, TCG-energy-style badges (colored circle + a distinct glyph per
+// type) living in our own /public/type-icons — the official in-game type
+// banners (PokeAPI's generation-ix/scarlet-violet set) read as a small
+// colored dash and are hard to tell apart at a glance, especially at small
+// sizes. One SVG per type, lowercase filename.
+const TYPE_ICON_NAMES = new Set([
+  "normal",
+  "fighting",
+  "flying",
+  "poison",
+  "ground",
+  "rock",
+  "bug",
+  "ghost",
+  "steel",
+  "fire",
+  "water",
+  "grass",
+  "electric",
+  "psychic",
+  "ice",
+  "dragon",
+  "dark",
+  "fairy",
+  "stellar",
+]);
 
 export function typeIconUrl(type: string | undefined): string | null {
   if (!type) return null;
-  const id = TYPE_IDS[type];
-  if (!id) return null;
-  return `${SPRITES_BASE}/types/generation-ix/scarlet-violet/${id}.png`;
+  const key = type.toLowerCase();
+  if (!TYPE_ICON_NAMES.has(key)) return null;
+  return `${BASE_PATH}/type-icons/${key}.svg`;
 }
 
 export function pokemonSpriteUrl(species: string, small = false): string | null {

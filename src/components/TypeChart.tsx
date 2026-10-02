@@ -1,9 +1,8 @@
 "use client";
 
 import { computeTypeChart } from "@/lib/typeChart";
-import { typeIconUrl } from "@/lib/sprites";
-import { toFrenchType } from "@/lib/champions/gameTranslations";
 import { useLocale } from "@/lib/i18n/LocaleContext";
+import TypeBadge from "./TypeBadge";
 
 const GROUPS: { mult: number; labelKey: string; color: string }[] = [
   { mult: 4, labelKey: "chart.x4", color: "var(--color-danger)" },
@@ -14,7 +13,7 @@ const GROUPS: { mult: number; labelKey: string; color: string }[] = [
 ];
 
 export default function TypeChart({ types }: { types: string[] }) {
-  const { t, locale } = useLocale();
+  const { t } = useLocale();
   if (types.length === 0) return null;
   const chart = computeTypeChart(types);
 
@@ -28,21 +27,14 @@ export default function TypeChart({ types }: { types: string[] }) {
   if (grouped.length === 0) return null;
 
   return (
-    <div className="mt-2 flex flex-col gap-1.5">
+    <div className="mt-2 flex flex-col gap-2">
       {grouped.map((g) => (
-        <div key={g.mult} className="flex flex-wrap items-center gap-1.5 text-xs">
-          <span className="tabular w-9 shrink-0 font-bold" style={{ color: g.color }}>
+        <div key={g.mult} className="flex flex-wrap items-center gap-1.5">
+          <span className="tabular w-9 shrink-0 text-xs font-bold" style={{ color: g.color }}>
             {t(g.labelKey)}
           </span>
           {g.types.map((ty) => (
-            <span
-              key={ty}
-              className="flex items-center gap-1 rounded-[6px] px-1.5 py-0.5"
-              style={{ background: "var(--color-panel-strong)" }}
-              title={locale === "fr" ? toFrenchType(ty) : ty}
-            >
-              {typeIconUrl(ty) && <img src={typeIconUrl(ty)!} alt="" className="h-4 w-4 object-contain" />}
-            </span>
+            <TypeBadge key={ty} type={ty} size="sm" />
           ))}
         </div>
       ))}

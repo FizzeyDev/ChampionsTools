@@ -9,21 +9,21 @@ import AllVsAllMatrix from "@/components/AllVsAllMatrix";
 import SpeedComparator from "@/components/SpeedComparator";
 import MoveComparator from "@/components/MoveComparator";
 import SavedPokemonModal from "@/components/SavedPokemonModal";
-import ChangelogModal from "@/components/ChangelogModal";
+import TeamCoverage from "@/components/TeamCoverage";
+import ChangelogPage from "@/components/ChangelogPage";
+import Sidebar, { type Mode, type View } from "@/components/Sidebar";
 import { computeMoveResults, type MoveResult } from "@/lib/calcEngine";
 import { computeBestMoves } from "@/lib/features/bestMoves";
 import { defaultField, defaultPokemon } from "@/lib/types";
 import { autofillForSpecies } from "@/lib/features/autofillSpecies";
 import { buildShareUrl, readStateFromLocation } from "@/lib/shareLink";
 import { useLocale } from "@/lib/i18n/LocaleContext";
-import { LOCALES } from "@/lib/i18n/translations";
 import type { PokemonState } from "@/lib/types";
 
-type Mode = "1v1" | "1vAll" | "Allv1" | "AllvAll" | "bestMoves" | "speedTiers" | "moveComparator";
-
 export default function Home() {
-  const { locale, setLocale, t } = useLocale();
+  const { locale, t } = useLocale();
 
+  const [view, setView] = useState<View>("calculator");
   const [mode, setMode] = useState<Mode>("1v1");
   const [attacker, setAttacker] = useState(() => defaultPokemon("Abomasnow"));
   const [defender, setDefender] = useState(() => defaultPokemon("Abomasnow"));
@@ -32,25 +32,25 @@ export default function Home() {
   const [field, setField] = useState(defaultField);
   const [copied, setCopied] = useState(false);
   const [showSaved, setShowSaved] = useState(false);
-  const [showChangelog, setShowChangelog] = useState(false);
   const [bestForward, setBestForward] = useState<MoveResult[]>([]);
   const [bestBackward, setBestBackward] = useState<MoveResult[]>([]);
   const [bestLoading, setBestLoading] = useState(false);
-  const [headerCollapsed, setHeaderCollapsed] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   useEffect(() => {
     try {
-      setHeaderCollapsed(window.localStorage.getItem("champcalc.headerCollapsed") === "1");
+      setSidebarCollapsed(window.localStorage.getItem("champcalc.sidebarCollapsed") === "1");
     } catch {
       // ignore
     }
   }, []);
 
-  const toggleHeader = () => {
-    setHeaderCollapsed((c) => {
+  const toggleSidebar = () => {
+    setSidebarCollapsed((c) => {
       const next = !c;
       try {
-        window.localStorage.setItem("champcalc.headerCollapsed", next ? "1" : "0");
+        window.localStorage.setItem("champcalc.sidebarCollapsed", next ? "1" : "0");
       } catch {
         // ignore
       }
@@ -148,98 +148,75 @@ export default function Home() {
 
   return (
     <div className="min-h-screen">
-      <header
-        className="sticky top-0 z-30 w-full"
-        style={{
-          background: "linear-gradient(180deg, var(--color-panel-soft) 0%, var(--color-panel) 100%)",
-          borderBottom: "1px solid var(--color-line)",
-        }}
-      >
-        <div className="flex items-center justify-between gap-2 px-3 py-2 sm:px-5 sm:py-2">
-          <h1
-            className="heading truncate text-base sm:text-2xl"
-            style={{ color: "var(--color-ink-bright)", textShadow: "0 0 30px var(--color-league-glow)" }}
-          >
-            {t("app.title")}
-          </h1>
-          {/* Collapsing the header is a small-screen space-saver — desktop
-              has plenty of room, so the toggle (and the collapsed state
-              itself) only applies below the sm breakpoint. */}
-          <button
-            type="button"
-            onClick={toggleHeader}
-            className="shrink-0 rounded-full px-2 py-1 text-xs sm:hidden"
-            style={{ border: "1px solid var(--color-line-strong)", color: "var(--color-ink-dim)" }}
-            title={headerCollapsed ? t("app.showHeader") : t("app.hideHeader")}
-          >
-            {headerCollapsed ? "▾" : "▴"}
-          </button>
-        </div>
+      <Sidebar
+        view={view}
+        mode={mode}
+        onSelectMode={setMode}
+        onSelectView={setView}
+        collapsed={sidebarCollapsed}
+        onToggleCollapsed={toggleSidebar}
+        mobileOpen={mobileNavOpen}
+        onOpenMobile={() => setMobileNavOpen(true)}
+        onCloseMobile={() => setMobileNavOpen(false)}
+      />
 
-        {
-          <div className={`${headerCollapsed ? "hidden sm:flex" : "flex"} flex-wrap items-center gap-2 px-3 pb-3 sm:px-5`}>
-            <p className="w-full text-xs text-ink-dim">{t("app.subtitle")}</p>
-            <div className="flex overflow-hidden rounded-full" style={{ border: "1px solid var(--color-line-strong)" }}>
-              {(["1v1", "1vAll", "Allv1", "AllvAll", "bestMoves", "speedTiers", "moveComparator"] as Mode[]).map((m) => (
-                <button
-                  key={m}
-                  onClick={() => setMode(m)}
-                  className="px-2 py-1.5 text-[0.62rem] font-bold uppercase tracking-wide transition sm:px-2.5 sm:text-[0.68rem]"
-                  style={{
-                    background: mode === m ? "var(--color-violet)" : "var(--color-panel-soft)",
-                    color: mode === m ? "var(--color-paper)" : "var(--color-ink-soft)",
-                  }}
-                >
-                  {t(`team.mode.${m}`)}
-                </button>
-              ))}
-            </div>
-            <div className="flex overflow-hidden rounded-full" style={{ border: "1px solid var(--color-line-strong)" }}>
-              {LOCALES.map((l) => (
-                <button
-                  key={l}
-                  onClick={() => setLocale(l)}
-                  className="px-2.5 py-1.5 text-[0.7rem] font-bold uppercase tracking-wide transition"
-                  style={{
-                    background: locale === l ? "var(--color-league)" : "var(--color-panel-soft)",
-                    color: locale === l ? "var(--color-paper)" : "var(--color-ink-soft)",
-                  }}
-                >
-                  {l}
-                </button>
-              ))}
-            </div>
-            <button onClick={share} className="pill-btn" style={{ color: "var(--color-violet)", borderColor: "rgba(159,83,236,0.4)", background: "var(--color-violet-soft)" }}>
-              🔗 {copied ? t("app.linkCopied") : t("app.copyLink")}
-            </button>
-            <button
-              onClick={() => setShowSaved(true)}
-              className="pill-btn"
-              style={{ color: "var(--color-amber)", borderColor: "rgba(255,215,64,0.4)", background: "var(--color-amber-soft)" }}
-            >
-              ★ {t("saved.viewButton")}
-            </button>
-            <button
-              onClick={() => setShowChangelog(true)}
-              className="pill-btn"
-              style={{ color: "var(--color-success)", borderColor: "rgba(76,175,130,0.4)", background: "var(--color-success-soft)" }}
-            >
-              🕒 {t("changelog.viewButton")}
-            </button>
-            {(mode === "1v1" || mode === "bestMoves") && (
-              <button
-                onClick={swap}
-                className="pill-btn"
-                style={{ color: "var(--color-league)", borderColor: "rgba(79,195,247,0.4)", background: "var(--color-league-soft)" }}
+      <div
+        className={`transition-[margin] duration-200 ${sidebarCollapsed ? "sm:ml-[4.25rem]" : "sm:ml-[15.5rem]"}`}
+      >
+        <header
+          className="sticky top-0 z-20 w-full"
+          style={{
+            background: "linear-gradient(180deg, var(--color-panel-soft) 0%, var(--color-panel) 100%)",
+            borderBottom: "1px solid var(--color-line)",
+          }}
+        >
+          <div className="flex flex-wrap items-center gap-2 px-3 py-2.5 pl-14 sm:px-5 sm:pl-5">
+            <div className="min-w-0">
+              <h1
+                className="heading truncate text-base sm:text-xl"
+                style={{ color: "var(--color-ink-bright)", textShadow: "0 0 30px var(--color-league-glow)" }}
               >
-                ⇄ {t("app.swap")}
-              </button>
+                {t("app.title")}
+              </h1>
+              <p className="hidden truncate text-xs text-ink-dim sm:block">{t("app.subtitle")}</p>
+            </div>
+            {view === "calculator" && (
+              <div className="ml-auto flex flex-wrap items-center gap-2">
+                <button
+                  onClick={share}
+                  className="pill-btn"
+                  style={{ color: "var(--color-violet)", borderColor: "rgba(159,83,236,0.4)", background: "var(--color-violet-soft)" }}
+                >
+                  🔗 {copied ? t("app.linkCopied") : t("calc.copyLink")}
+                </button>
+                <button
+                  onClick={() => setShowSaved(true)}
+                  className="pill-btn"
+                  style={{ color: "var(--color-amber)", borderColor: "rgba(255,215,64,0.4)", background: "var(--color-amber-soft)" }}
+                >
+                  ★ {t("calc.saved")}
+                </button>
+                {(mode === "1v1" || mode === "bestMoves") && (
+                  <button
+                    onClick={swap}
+                    className="pill-btn"
+                    style={{ color: "var(--color-league)", borderColor: "rgba(79,195,247,0.4)", background: "var(--color-league-soft)" }}
+                  >
+                    ⇄ {t("app.swap")}
+                  </button>
+                )}
+              </div>
             )}
           </div>
-        }
-      </header>
+        </header>
 
-      <div className="mx-auto flex w-full max-w-[1600px] flex-col gap-5 px-4 py-6 sm:px-6">
+        <div className="mx-auto flex w-full max-w-[1600px] flex-col gap-5 px-4 py-6 sm:px-6">
+        {view === "teamCoverage" && <TeamCoverage />}
+
+        {view === "changelog" && <ChangelogPage />}
+
+        {view === "calculator" && (
+          <>
         {mode === "1v1" && (
           <>
             <div className="grid grid-cols-2 gap-2 sm:gap-5">
@@ -420,10 +397,13 @@ export default function Home() {
             </div>
           </>
         )}
+          </>
+        )}
 
         <footer className="flex flex-col items-center gap-1 pb-6 pt-2 text-center text-xs text-ink-dim sm:text-sm">
           <p className="max-w-2xl">{t("app.footer")}</p>
         </footer>
+        </div>
       </div>
 
       <SavedPokemonModal
@@ -434,7 +414,6 @@ export default function Home() {
           else setDefender(pkm);
         }}
       />
-      <ChangelogModal forceOpen={showChangelog} onForceClose={() => setShowChangelog(false)} />
     </div>
   );
 }

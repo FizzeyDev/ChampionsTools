@@ -23,10 +23,13 @@ import { autofillForSpecies } from "@/lib/features/autofillSpecies";
 import { getMetaSet } from "@/lib/champions/metaSets";
 import { getMoveDescription, getAbilityDescription, getItemDescription } from "@/lib/champions/descriptions";
 import { toFrench, toFrenchType } from "@/lib/champions/gameTranslations";
+import { typeGradient } from "@/lib/typeColors";
+import TypeBadge from "./TypeBadge";
 import { getItemCategory, ITEM_CATEGORY_ORDER, type ItemCategory } from "@/lib/champions/itemCategories";
 import { HOLD_ITEMS, MEGA_STONES, NEW_MEGA_STONES, BERRIES } from "@/lib/champions/items";
 import { NATURE_EFFECTS, natureStatAbbr } from "@/lib/natures";
 import { useLocale } from "@/lib/i18n/LocaleContext";
+import { defaultPokemon } from "@/lib/types";
 import type { FieldState, PokemonState } from "@/lib/types";
 import IconSearchSelect from "./IconSearchSelect";
 import StatRow from "./StatRow";
@@ -47,6 +50,12 @@ interface PokemonCardProps {
   onChange: (next: PokemonState) => void;
   showMoves?: boolean;
   restrictAbilityToReal?: boolean;
+  /** When true, picking a species only sets the species — item, ability,
+   * moves and Stat Points are left untouched (blank on a fresh slot)
+   * instead of being auto-filled from a curated/heuristic set. Used by
+   * Team Coverage, where a freshly added member should show nothing
+   * until the user fills it in themselves. */
+  noAutofill?: boolean;
   /** Battle field, so the Speed row can reflect item/ability/weather/
    * Tailwind modifiers (Choice Scarf, Swift Swim, etc.), not just stage
    * boosts. Optional — cards used outside a battle context (roster slots)
@@ -64,6 +73,7 @@ export default function PokemonCard({
   onChange,
   showMoves = true,
   restrictAbilityToReal = false,
+  noAutofill = false,
   field,
   sideKey,
 }: PokemonCardProps) {
@@ -119,6 +129,13 @@ export default function PokemonCard({
   const speciesRequestRef = useRef(0);
   const handleSpeciesChange = async (newSpecies: string) => {
     const requestId = ++speciesRequestRef.current;
+    if (noAutofill) {
+      onChange({
+        ...defaultPokemon(newSpecies),
+        level: state.level,
+      });
+      return;
+    }
     const next = await autofillForSpecies(state, newSpecies);
     if (speciesRequestRef.current !== requestId) return;
     onChange(next);
@@ -191,7 +208,11 @@ export default function PokemonCard({
   return (
     <section
       className="card-shell p-4"
-      style={{ borderColor: accentBorderRgba, boxShadow: `var(--shadow-md), 0 0 32px ${accentGlowVar}` }}
+      style={{
+        borderColor: accentBorderRgba,
+        boxShadow: `var(--shadow-md), 0 0 32px ${accentGlowVar}`,
+        background: `${typeGradient(types)}, var(--color-panel)`,
+      }}
     >
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2 border-b pb-3" style={{ borderColor: "var(--color-line)" }}>
         <h2 className="heading text-lg" style={{ color: accentVar, textShadow: `0 0 20px ${accentGlowVar}` }}>
@@ -310,16 +331,7 @@ export default function PokemonCard({
           {types.length > 0 && (
             <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
               {types.map((ty) => (
-                <span
-                  key={ty}
-                  className="flex items-center gap-1 rounded-[6px] px-1.5 py-0.5 text-xs"
-                  style={{ background: "var(--color-panel-strong)", border: "1px solid var(--color-line)" }}
-                >
-                  {typeIconUrl(ty) && (
-                    <img src={typeIconUrl(ty)!} alt="" className="h-4 w-4 object-contain" />
-                  )}
-                  {locale === "fr" ? toFrenchType(ty) : ty}
-                </span>
+                <TypeBadge key={ty} type={ty} size="sm" />
               ))}
               <button
                 type="button"
