@@ -369,8 +369,7 @@ megaDefs.push({
 });
 
 // Reg M-C additions (newer update). Stats verified against Serebii's
-// Champions stat rankings; Golisopod's exact ability wasn't visible in the
-// fetched data and is a best-effort placeholder pending verification.
+// Champions stat rankings.
 megaDefs.push({
   name: "Mega Salamence",
   baseSpeciesName: "Salamence",
@@ -390,7 +389,11 @@ megaDefs.push({
   baseSpeciesName: "Golisopod",
   types: ["Bug", "Steel"],
   baseStats: { hp: 75, atk: 150, def: 175, spa: 70, spd: 120, spe: 40 },
-  ability: "Emergency Exit", // unverified — base ability used as placeholder
+  // Confirmed via champdex.com/dex/mega-golisopod and
+  // pokebase.app/pokemon-champions/pokemon/golisopod-mega — usage-stat pages
+  // show "Emergency Exit" because that's Golisopod's pre-Mega base ability
+  // as listed on team sheets, not what the Mega itself actually has in battle.
+  ability: "Tough Claws",
 });
 
 export const MEGA_SPECIES_NAMES = megaDefs.map((m) => m.name);

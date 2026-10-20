@@ -72,15 +72,13 @@ export const META_SETS: Record<string, MetaSet> = {
     source: "Pikalytics usage stats; SP is a sensible bulky-support default",
     spConfirmed: false,
   },
-  "Floette-Mega": {
-    item: "Floettite",
-    ability: "Fairy Aura",
-    nature: "Timid",
-    sp: { hp: 2, spa: 32, spe: 32 },
-    moves: ["Protect", "Dazzling Gleam", "Moonblast", "Light of Ruin"],
-    source: "Pikalytics usage stats; SP is a sensible special-sweeper default",
-    spConfirmed: false,
-  },
+  // This key used to be "Floette-Mega" (a dead key — doesn't match the real
+  // species name "Mega Floette" used in megaSpecies.ts, so it was never
+  // actually reachable/pickable in the app). Renaming it to match turned out
+  // to collide with an already-existing, already-live "Mega Floette" entry
+  // further down (the MetaVGC aggregate one), so this unreachable duplicate
+  // is removed rather than kept as a second, conflicting entry for the same
+  // species.
   Sinistcha: {
     item: "Kasib Berry",
     ability: "Hospitality",
@@ -153,7 +151,7 @@ export const META_SETS: Record<string, MetaSet> = {
     source: "Pikalytics usage stats; SP is a sensible bulky-support default",
     spConfirmed: false,
   },
-  "Dragonite-Mega": {
+  "Mega Dragonite": {
     item: "Dragoninite",
     ability: "Multiscale",
     nature: "Timid",
@@ -225,7 +223,7 @@ export const META_SETS: Record<string, MetaSet> = {
     source: "Pikalytics usage stats; SP is a sensible fast-attacker default",
     spConfirmed: false,
   },
-  "Froslass-Mega": {
+  "Mega Froslass": {
     item: "Froslassite",
     ability: "Snow Warning",
     nature: "Timid",
@@ -234,6 +232,13 @@ export const META_SETS: Record<string, MetaSet> = {
     source: "Pikalytics usage stats; SP is a sensible special-sweeper default",
     spConfirmed: false,
   },
+  // "Mega Scovillain" isn't defined as a species in megaSpecies.ts yet (no
+  // verified base stats found for it), so this key intentionally doesn't
+  // match anything real yet and this set stays dormant. Keeping the sourced
+  // data here (not deleting it) so it's ready the moment the species is
+  // added — renaming it to match would make an currently-nonexistent
+  // species pickable with no stats behind it, which is worse than leaving
+  // it inert.
   "Scovillain-Mega": {
     item: "Scovillainite",
     ability: "Spicy Spray",
@@ -812,13 +817,20 @@ export const META_SETS: Record<string, MetaSet> = {
     source: "Pikalytics live usage feed (Reg M-B S3, 0.14% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
-  "Meganium": {
-    item: "Zeraorite",
-    ability: "Overgrow",
-    nature: "Timid",
+  "Mega Meganium": {
+    // Pikalytics' page for this set shows 100% "Meganiumite" and 85% "Modest"
+    // nature — this data describes the Mega form, not base Meganium (the key
+    // was renamed to match). Ability on that page shows 71% "Overgrow", but
+    // that's the pre-Mega base ability as listed on team sheets, same as
+    // Golisopod — the Mega's real/locked ability is "Mega Sol" (see
+    // megaSpecies.ts), which is what actually applies once Meganium Mega
+    // Evolves and is what the damage calc needs here.
+    item: "Meganiumite",
+    ability: "Mega Sol",
+    nature: "Modest",
     sp: { hp: 4, spa: 30, spe: 32 },
     moves: ["Solar Beam", "Weather Ball", "Dazzling Gleam", "Protect"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 0.14% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 0.14% usage) — item/nature re-verified directly against pikalytics.com/pokedex/battledataregmbs3/Meganium (100% Meganiumite, 85% Modest); SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Houndstone": {
@@ -981,6 +993,83 @@ export const META_SETS: Record<string, MetaSet> = {
     sp: { hp: 4, spa: 30, spe: 32 },
     moves: ["Fake Out", "Sludge Bomb", "Heat Wave", "Protect"],
     source: "Pikalytics live usage feed (Reg M-B S3, 0.08% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    spConfirmed: false,
+  },
+
+  // --- Added to broaden roster coverage: real, sourced Reg M-C sets for
+  // previously-uncurated species, pulled from Pikalytics' live Champions VGC
+  // 2026 Reg M-C usage feed (pikalytics.com/pokedex/gen9championsvgc2026regmc).
+  // That feed doesn't expose nature/EV breakdowns, only items/abilities/moves,
+  // so SP/nature here are role-based defaults like the rest of this file's
+  // "(not from this feed)" entries — spConfirmed: false throughout.
+  "Rillaboom": {
+    item: "Life Orb",
+    ability: "Grassy Surge",
+    nature: "Adamant",
+    sp: { hp: 4, atk: 30, spe: 32 },
+    moves: ["Fake Out", "Grassy Glide", "Wood Hammer", "U-turn"],
+    source: "Pikalytics live usage feed (Champions VGC 2026 Reg M-C) — item 29.2%, ability 99.3%, moves (Fake Out 55.3%, Grassy Glide 37.1%, Wood Hammer 33.5%, U-turn 18.6%); SP/nature are a role-based default (not from this feed)",
+    spConfirmed: false,
+  },
+  "Mega Salamence": {
+    // Pikalytics' page shows this under base "Salamence" with 98% Salamencite
+    // and 98% Intimidate — same pattern as Golisopod/Meganium: that's the
+    // pre-Mega team-sheet ability, not the Mega's real one. The Mega's actual
+    // ability (megaSpecies.ts) is Aerilate, used here instead.
+    item: "Salamencite",
+    ability: "Aerilate",
+    nature: "Naive",
+    sp: { hp: 4, atk: 12, spa: 18, spe: 32 },
+    moves: ["Hyper Voice", "Protect", "Tailwind", "Double-Edge"],
+    source: "Pikalytics live usage feed (Champions VGC 2026 Reg M-C, as base 'Salamence') — item 98.1%, moves (Hyper Voice 55.0%, Protect 40.4%, Tailwind 22.8%, Double-Edge 16.8%); ability corrected to the Mega's real ability; SP/nature are a role-based mixed-attacker default (not from this feed)",
+    spConfirmed: false,
+  },
+  "Mega Baxcalibur": {
+    item: "Baxcalibrite",
+    ability: "Thermal Exchange",
+    nature: "Adamant",
+    sp: { hp: 4, atk: 30, spe: 32 },
+    moves: ["Protect", "Glaive Rush", "Ice Shard", "Icicle Crash"],
+    source: "Pikalytics live usage feed (Champions VGC 2026 Reg M-C, as base 'Baxcalibur') — item 88.8%, ability 78.1% (matches the Mega's real ability here), moves (Protect 49.6%, Glaive Rush 48.5%, Ice Shard 34.3%, Icicle Crash 17.6%); SP/nature are a role-based default (not from this feed)",
+    spConfirmed: false,
+  },
+  "Mega Hawlucha": {
+    // Same pre-Mega-ability pattern as Mega Salamence: Pikalytics shows base
+    // "Hawlucha" with 92% Mold Breaker (its real base ability), but the
+    // Mega's own locked ability (megaSpecies.ts) is No Guard, used here.
+    item: "Hawluchanite",
+    ability: "No Guard",
+    nature: "Jolly",
+    sp: { hp: 4, atk: 30, spe: 32 },
+    moves: ["Entrainment", "Acrobatics", "Close Combat", "Protect"],
+    source: "Pikalytics live usage feed (Champions VGC 2026 Reg M-C, as base 'Hawlucha') — item 60.7%, moves (Entrainment 32.6%, Acrobatics 19.9%, Close Combat 16.3%, Protect 15.0%); ability corrected to the Mega's real ability; SP/nature are a role-based default (not from this feed)",
+    spConfirmed: false,
+  },
+  "Zoroark": {
+    item: "Life Orb",
+    ability: "Illusion",
+    nature: "Timid",
+    sp: { hp: 4, spa: 30, spe: 32 },
+    moves: ["Night Daze", "Dark Pulse", "Snarl", "Protect"],
+    source: "Pikalytics live usage feed (Champions VGC 2026 Reg M-C) — item 40% Life Orb, all 4 moves shown at 100% usage in the table; ability is Zoroark's only real ability (Illusion); SP/nature are a role-based default (not from this feed)",
+    spConfirmed: false,
+  },
+  "Krookodile": {
+    item: "Life Orb",
+    ability: "Intimidate",
+    nature: "Adamant",
+    sp: { hp: 4, atk: 30, spe: 32 },
+    moves: ["Earthquake", "Knock Off", "High Horsepower", "Protect"],
+    source: "Pikalytics live usage feed (Champions VGC 2026 Reg M-C) — item 48.8%, ability 76.3%, moves (Earthquake 27.5%, Knock Off 22.2%, High Horsepower 15.7%, Protect 13.4%); SP/nature are a role-based default (not from this feed)",
+    spConfirmed: false,
+  },
+  "Skeledirge": {
+    item: "Sitrus Berry",
+    ability: "Unaware",
+    nature: "Calm",
+    sp: { hp: 30, def: 4, spd: 32 },
+    moves: ["Torch Song", "Will-O-Wisp", "Protect", "Slack Off"],
+    source: "Pikalytics live usage feed (Champions VGC 2026 Reg M-C) — item 42.9% Sitrus Berry, moves (Torch Song 64.3%, Will-O-Wisp 28.6%, Protect 21.4%, Slack Off/Earth Power tied 14.3% — Slack Off picked as the more universally useful 4th slot); ability data unavailable on the feed, Unaware used as Skeledirge's standard bulky-support ability; SP/nature are a role-based bulky-support default (not from this feed)",
     spConfirmed: false,
   },
 };

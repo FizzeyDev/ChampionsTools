@@ -20,6 +20,7 @@ import {
 import { useLocale } from "@/lib/i18n/LocaleContext";
 import { LOCALES } from "@/lib/i18n/translations";
 import { hasUnseenChangelog } from "@/lib/features/changelog";
+import { BASE_PATH } from "@/lib/sprites";
 
 export type Mode = "1v1" | "1vAll" | "Allv1" | "AllvAll" | "bestMoves" | "speedTiers" | "moveComparator";
 export type View = "calculator" | "teamCoverage" | "changelog";
@@ -163,7 +164,7 @@ export default function Sidebar({
             className="flex h-[30px] w-[30px] shrink-0 items-center justify-center overflow-hidden rounded-[8px]"
             style={{ background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.2)" }}
           >
-            <Image src="/logo.svg" alt="" width={30} height={30} className="h-full w-full" />
+            <Image src={`${BASE_PATH}/logo.svg`} alt="" width={30} height={30} className="h-full w-full" />
           </span>
           {expanded && (
             <span
@@ -279,7 +280,7 @@ export default function Sidebar({
                 className="flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-[7px]"
                 style={{ background: "rgba(79,195,247,0.07)", border: "1px solid rgba(79,195,247,0.12)" }}
               >
-                <Image src="/favicon/unite-tools-logo.svg" alt="" width={28} height={28} className="h-full w-full" />
+                <Image src={`${BASE_PATH}/favicon/unite-tools-logo.svg`} alt="" width={28} height={28} className="h-full w-full" />
               </span>
               <span className="flex min-w-0 flex-1 flex-col">
                 <span className="truncate text-[0.75rem] font-bold tracking-wide" style={{ color: "#b0cdd0" }}>
@@ -323,7 +324,7 @@ export default function Sidebar({
                   title={l === "fr" ? "Français" : "English"}
                 >
                   <Image
-                    src={`/favicon/flags/${l}.svg`}
+                    src={`${BASE_PATH}/favicon/flags/${l}.svg`}
                     alt={l}
                     width={22}
                     height={14}

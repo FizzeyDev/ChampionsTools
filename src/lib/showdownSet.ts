@@ -1,4 +1,5 @@
 import { ABILITY_NAMES, MOVE_NAMES, NATURE_NAMES, SPECIES_NAMES, STAT_KEYS } from "./gen";
+import { spToEv } from "./champions/statPoints";
 import { defaultPokemon } from "./types";
 import type { PokemonState, StatsTable } from "./types";
 
@@ -85,6 +86,18 @@ export function parseShowdownSet(text: string): PokemonState | null {
       }
     } else if (/^evs\s*:/i.test(line)) {
       Object.assign(state.evs, parseStatLine(line.split(":")[1]));
+    } else if (/^(stat points|sp)\s*:/i.test(line)) {
+      // Some Champions-specific set shares (in-game screenshots, community
+      // tools) label the spread "Stat Points:"/"SP:" with 0-32 numbers
+      // directly, instead of the classic Showdown "EVs:" 0-252 scale. Parsed
+      // the same way, then converted through the game's real SP→EV formula
+      // (statPoints.ts) rather than stored as a raw EV number — pasting
+      // "32 SpA" here should mean "max SpA investment", the same as using
+      // the SP slider, not "32 out of 252" EV.
+      const spValues = parseStatLine(line.split(":").slice(1).join(":"));
+      for (const key of STAT_KEYS) {
+        if (spValues[key] !== undefined) state.evs[key] = spToEv(spValues[key]!);
+      }
     } else if (/^ivs\s*:/i.test(line)) {
       // Champions fixes IVs at 31 for every stat — imported IV lines are
       // intentionally ignored rather than producing an inaccurate state.

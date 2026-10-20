@@ -19,6 +19,42 @@ export interface ChangelogEntry {
  * the next bump. */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "0.6.1",
+    date: "2026-10-20",
+    notes: [
+      {
+        tag: "fix",
+        en: "GitHub Pages deployment: the sidebar logo, the Unite Tools logo and the language flags no longer 404 — they were missing their deployment subpath prefix.",
+        fr: "Déploiement GitHub Pages : le logo de la sidebar, le logo Unite Tools et les drapeaux de langue ne font plus de 404 — il leur manquait le préfixe de sous-dossier du déploiement.",
+      },
+      {
+        tag: "fix",
+        en: "Fixed the real cause of Pokemon tanking more or less than expected after switching species several times: the previous Pokemon's held item (often a Mega Stone) could silently stay equipped on the new one. Ability, Tera type, status and \"ability triggered\" are now reset on every switch too.",
+        fr: "Corrigé la vraie cause des Pokemon qui encaissaient plus ou moins de dégâts que prévu après plusieurs changements d'espèce : l'objet tenu du Pokemon précédent (souvent une Méga-Pierre) pouvait rester équipé silencieusement sur le nouveau. Le talent, le type Tera, le statut et \"talent déclenché\" se réinitialisent maintenant aussi à chaque changement.",
+      },
+      {
+        tag: "fix",
+        en: "Moveset legality checking no longer produces false \"illegal move\" warnings for real, sourced competitive moves missing from the underlying move database (e.g. Sucker Punch on Kingambit) — curated sets' own moves are now always treated as legal.",
+        fr: "La vérification de légalité des capacités ne génère plus de faux avertissements \"capacité illégale\" pour de vraies capacités compétitives sourcées absentes de la base de données sous-jacente (ex. Coup Bas sur Kingambit) — les capacités des sets curatés sont désormais toujours considérées comme légales.",
+      },
+      {
+        tag: "fix",
+        en: "Fixed several curated sets that pointed at the wrong Mega form or the wrong item/ability/nature (Mega Floette, Mega Dragonite, Mega Froslass, Mega Golisopod's ability, and Mega Meganium's item/nature/ability, which was mislabeled as base Meganium).",
+        fr: "Correction de plusieurs sets curatés qui pointaient vers la mauvaise forme Méga ou avaient le mauvais objet/talent/nature (Méga Floette, Méga Dragonite, Méga Froslass, le talent de Méga Golisopod, et l'objet/la nature/le talent de Méga Meganium, qui était mal étiqueté comme Meganium de base).",
+      },
+      {
+        tag: "new",
+        en: "Added 7 more real, sourced competitive sets: Rillaboom, Mega Salamence, Mega Baxcalibur, Mega Hawlucha, Zoroark, Krookodile and Skeledirge.",
+        fr: "Ajout de 7 nouveaux sets compétitifs réels et sourcés : Rillaboom, Méga Salamence, Méga Baxcalibur, Méga Hawlucha, Zoroark, Krookodile et Skeledirge.",
+      },
+      {
+        tag: "new",
+        en: "Importing a set now also understands a \"Stat Points:\"/\"SP:\" line (0-32 per stat, the game's own scale) as an alternative to the classic Showdown \"EVs:\" line (0-252).",
+        fr: "L'import d'un set reconnaît maintenant aussi une ligne \"Stat Points:\"/\"SP:\" (0-32 par stat, l'échelle du jeu) en plus de la ligne classique Showdown \"EVs:\" (0-252).",
+      },
+    ],
+  },
+  {
     version: "0.6.0",
     date: "2026-10-01",
     notes: [

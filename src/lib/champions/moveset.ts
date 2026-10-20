@@ -1,6 +1,7 @@
 import { Dex } from "@pkmn/dex";
 import { gen } from "../gen";
 import { champGen } from "./megaSpecies";
+import { getMetaSet } from "./metaSets";
 
 const cache = new Map<string, Promise<Set<string>>>();
 
@@ -39,12 +40,29 @@ async function fetchMoveset(learnsetId: string): Promise<Set<string>> {
 }
 
 /** Cached, de-duplicated fetch of a species' real Gen 9 / Champions moveset.
- * Mega forms automatically resolve to their base species' moveset. */
-export function getChampionsMoveset(species: string): Promise<Set<string>> {
-  if (!species) return Promise.resolve(new Set());
+ * Mega forms automatically resolve to their base species' moveset.
+ *
+ * Also always unions in that species' own curated meta-set moves (see
+ * metaSets.ts), if it has one. Those are real, sourced competitive moves
+ * (Pikalytics/tournament teams), and @pkmn/dex's bundled learnset data
+ * turns out to be missing some well-documented Gen 9 movepool entries
+ * outright — e.g. its Kingambit entry has no Sucker Punch at all, not even
+ * tagged to an older gen, almost certainly a data gap rather than Kingambit
+ * really being unable to learn it. Without this union, a verified
+ * real-world move could get flagged as "unusual" in the UI purely because
+ * of that gap. The raw per-species learnset fetch itself stays cached by
+ * its resolved base id (shared across a Mega and its base form, as
+ * before); the meta-set union is applied fresh per call so two forms
+ * resolving to the same learnset never cross-contaminate each other's
+ * meta moves. */
+export async function getChampionsMoveset(species: string): Promise<Set<string>> {
+  if (!species) return new Set();
   const key = resolveLearnsetId(species);
   if (!cache.has(key)) {
     cache.set(key, fetchMoveset(key));
   }
-  return cache.get(key)!;
+  const learned = await cache.get(key)!;
+  const metaMoves = getMetaSet(species)?.moves.filter(Boolean) ?? [];
+  if (metaMoves.length === 0) return learned;
+  return new Set([...learned, ...metaMoves]);
 }

@@ -6,8 +6,13 @@ const SPRITES_BASE = "https://raw.githubusercontent.com/PokeAPI/sprites/master/s
 // Needed so /custom-sprites/... (a real file in our own /public folder)
 // still resolves correctly when the site is deployed under a subpath, e.g.
 // GitHub Pages project sites (username.github.io/repo-name/...). Set at
-// build time — see next.config.ts.
-const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+// build time — see next.config.ts. Exported so any component rendering a
+// plain <img>/<Image> pointing at a local /public file can prefix it too:
+// next/image does NOT auto-prepend basePath when images.unoptimized is on
+// (confirmed by inspecting the static-export output), so every hardcoded
+// "/something.svg" needs this by hand or it silently 404s under a subpath
+// deployment like username.github.io/repo-name/.
+export const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
 // Round, TCG-energy-style badges (colored circle + a distinct glyph per
 // type) living in our own /public/type-icons — the official in-game type
