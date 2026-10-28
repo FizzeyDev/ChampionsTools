@@ -1,5 +1,5 @@
 import { champGen } from "./megaSpecies";
-import type { StatsTable } from "../types";
+import type { StatsTable } from "../calc/types";
 
 const ZERO_STATS: StatsTable = { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 };
 

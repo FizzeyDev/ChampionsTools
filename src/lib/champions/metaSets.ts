@@ -1,4 +1,4 @@
-import type { StatKey } from "../gen";
+import type { StatKey } from "../calc/gen";
 
 export interface MetaSet {
   item: string;
@@ -9,12 +9,12 @@ export interface MetaSet {
   moves: string[];
   source: string;
   /** False when the exact Stat Point spread wasn't confirmed at the source
-   * and a sensible default was used instead — item/ability/nature/moves are
+   * and a sensible default was used instead - item/ability/nature/moves are
    * still real, sourced data either way. */
   spConfirmed: boolean;
 }
 
-// Curated from real Regulation M-A/M-B/M-C usage data — mainly Pikalytics
+// Curated from real Regulation M-A/M-B/M-C usage data - mainly Pikalytics
 // (aggregated usage stats across thousands of ranked battles, the closest
 // Champions equivalent to Smogon's own usage stats), cross-checked against
 // MetaVGC tournament team pages and Game8 for exact Stat Point spreads
@@ -22,7 +22,7 @@ export interface MetaSet {
 // Pokémon that actually see competitive play; the vast majority of the
 // Champions Pokédex simply isn't used at this level, so there's nothing
 // "meta" to source for them (they keep the generic real-ability + first-4
-// -moves autofill instead). This list grows over time — see each entry's
+// -moves autofill instead). This list grows over time - see each entry's
 // `source` comment to add more or double check one.
 export const META_SETS: Record<string, MetaSet> = {
   // --- Pikalytics usage stats, Champions VGC 2026 Reg M-A (pikalytics.com/pokedex/gen9championsvgc2026regma) ---
@@ -33,7 +33,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Adamant",
     sp: { hp: 32, atk: 32, def: 2 },
     moves: ["Sucker Punch", "Kowtow Cleave", "Protect", "Low Kick"],
-    source: "Pikalytics usage stats — top SP spread (Adamant 32/32/0/0/2/0, 6.5% of sets) confirmed",
+    source: "Pikalytics usage stats - top SP spread (Adamant 32/32/0/0/2/0, 6.5% of sets) confirmed",
     spConfirmed: true,
   },
   Garchomp: {
@@ -51,7 +51,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Modest",
     sp: { hp: 24, def: 14, spa: 11, spe: 17 },
     moves: ["Heat Wave", "Protect", "Solar Beam", "Weather Ball"],
-    source: "Pikalytics usage stats — top SP spread (Modest 24/0/14/11/0/17, 4.8% of sets) confirmed",
+    source: "Pikalytics usage stats - top SP spread (Modest 24/0/14/11/0/17, 4.8% of sets) confirmed",
     spConfirmed: true,
   },
   Sneasler: {
@@ -60,7 +60,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Jolly",
     sp: { hp: 2, atk: 32, spe: 32 },
     moves: ["Close Combat", "Dire Claw", "Fake Out", "Protect"],
-    source: "Pikalytics usage stats — top SP spread (Jolly 2/32/0/0/0/32, 13.4% of sets) confirmed",
+    source: "Pikalytics usage stats - top SP spread (Jolly 2/32/0/0/0/32, 13.4% of sets) confirmed",
     spConfirmed: true,
   },
   Incineroar: {
@@ -72,7 +72,7 @@ export const META_SETS: Record<string, MetaSet> = {
     source: "Pikalytics usage stats; SP is a sensible bulky-support default",
     spConfirmed: false,
   },
-  // This key used to be "Floette-Mega" (a dead key — doesn't match the real
+  // This key used to be "Floette-Mega" (a dead key - doesn't match the real
   // species name "Mega Floette" used in megaSpecies.ts, so it was never
   // actually reachable/pickable in the app). Renaming it to match turned out
   // to collide with an already-existing, already-live "Mega Floette" entry
@@ -130,7 +130,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Jolly",
     sp: { hp: 2, atk: 32, spe: 32 },
     moves: ["Rock Slide", "Dual Wingbeat", "Tailwind", "Protect"],
-    source: "Pikalytics usage stats — top SP spread (Jolly 2/32/0/0/0/32, 14.0% of sets) confirmed",
+    source: "Pikalytics usage stats - top SP spread (Jolly 2/32/0/0/0/32, 14.0% of sets) confirmed",
     spConfirmed: true,
   },
   Pelipper: {
@@ -236,7 +236,7 @@ export const META_SETS: Record<string, MetaSet> = {
   // verified base stats found for it), so this key intentionally doesn't
   // match anything real yet and this set stays dormant. Keeping the sourced
   // data here (not deleting it) so it's ready the moment the species is
-  // added — renaming it to match would make an currently-nonexistent
+  // added - renaming it to match would make an currently-nonexistent
   // species pickable with no stats behind it, which is worse than leaving
   // it inert.
   "Scovillain-Mega": {
@@ -254,18 +254,18 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Jolly",
     sp: { atk: 32, def: 2, spe: 32 },
     moves: ["Last Respects", "Aqua Jet", "Wave Crash", "Protect"],
-    source: "Pikalytics usage stats — top SP spread (Jolly 0/32/2/0/0/32, 12.4% of sets) confirmed",
+    source: "Pikalytics usage stats - top SP spread (Jolly 0/32/2/0/0/32, 12.4% of sets) confirmed",
     spConfirmed: true,
   },
 
-  // --- MetaVGC tournament team (Forblaze, 1st — SNT Reg M-C Tour #1) — exact SP confirmed ---
+  // --- MetaVGC tournament team (Forblaze, 1st - SNT Reg M-C Tour #1) - exact SP confirmed ---
   "Mega Golisopod": {
     item: "Golisopite",
     ability: "Tough Claws",
     nature: "Adamant",
     sp: { hp: 32, atk: 32, def: 2 },
     moves: ["Protect", "Swords Dance", "Iron Head", "Brick Break"],
-    source: "Forblaze, 1st — SNT Reg M-C Tour #1 (MetaVGC)",
+    source: "Forblaze, 1st - SNT Reg M-C Tour #1 (MetaVGC)",
     spConfirmed: true,
   },
   "Indeedee-F": {
@@ -274,7 +274,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Bold",
     sp: { hp: 32, atk: 2, def: 32 },
     moves: ["Follow Me", "Psychic", "Protect", "Trick Room"],
-    source: "Forblaze, 1st — SNT Reg M-C Tour #1 (MetaVGC)",
+    source: "Forblaze, 1st - SNT Reg M-C Tour #1 (MetaVGC)",
     spConfirmed: true,
   },
   Toxapex: {
@@ -283,7 +283,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Calm",
     sp: { hp: 32, def: 18, spd: 16 },
     moves: ["Toxic", "Baneful Bunker", "Infestation", "Wide Guard"],
-    source: "Forblaze, 1st — SNT Reg M-C Tour #1 (MetaVGC)",
+    source: "Forblaze, 1st - SNT Reg M-C Tour #1 (MetaVGC)",
     spConfirmed: true,
   },
   "Swampert-Mega": {
@@ -292,7 +292,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Adamant",
     sp: { hp: 25, atk: 26, spe: 15 },
     moves: ["Earthquake", "Wave Crash", "Rock Slide", "Protect"],
-    source: "Forblaze, 1st — SNT Reg M-C Tour #1 (MetaVGC)",
+    source: "Forblaze, 1st - SNT Reg M-C Tour #1 (MetaVGC)",
     spConfirmed: true,
   },
 
@@ -303,7 +303,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Impish",
     sp: { hp: 20, def: 24, spd: 20 },
     moves: ["Body Press", "Wood Hammer", "Wide Guard", "Spiky Shield"],
-    source: "Zemar12, 1st — VGC UmbreNews 08.09.2026 #31 (Pokémon-Zone); SP is a sensible bulky default",
+    source: "Zemar12, 1st - VGC UmbreNews 08.09.2026 #31 (Pokémon-Zone); SP is a sensible bulky default",
     spConfirmed: false,
   },
   "Gardevoir-Mega": {
@@ -316,7 +316,7 @@ export const META_SETS: Record<string, MetaSet> = {
     spConfirmed: true,
   },
 
-  // --- MetaVGC per-Pokémon "most common build" aggregate — exact SP confirmed ---
+  // --- MetaVGC per-Pokémon "most common build" aggregate - exact SP confirmed ---
   "Mega Chesnaught": {
     item: "Chesnaughtite",
     ability: "Bulletproof",
@@ -338,7 +338,7 @@ export const META_SETS: Record<string, MetaSet> = {
 
   // --- Auto-generated from Pikalytics' live usage feed (Reg M-B S3), decoded via @pkmn/dex --- 
   // item/ability/moves are real, usage-ranked data; Stat Point spreads are role-based
-  // defaults (not from this feed) since it doesn't expose EV/SP data — see individual
+  // defaults (not from this feed) since it doesn't expose EV/SP data - see individual
   // `source` strings. Regenerate via generate_metasets.ts if the feed updates.
   "Charizard": {
     item: "Focus Sash",
@@ -346,7 +346,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Timid",
     sp: { hp: 4, spa: 30, spe: 32 },
     moves: ["Protect", "Heat Wave", "Solar Beam", "Weather Ball"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 3.66% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 3.66% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Floette-Eternal": {
@@ -355,7 +355,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Timid",
     sp: { hp: 4, spa: 30, spe: 32 },
     moves: ["Protect", "Dazzling Gleam", "Moonblast", "Calm Mind"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 2.92% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 2.92% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Staraptor": {
@@ -364,7 +364,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Jolly",
     sp: { hp: 4, atk: 30, spe: 32 },
     moves: ["Close Combat", "Protect", "Brave Bird", "Roost"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 2.68% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 2.68% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Raichu": {
@@ -373,7 +373,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Timid",
     sp: { hp: 4, spa: 30, spe: 32 },
     moves: ["Fake Out", "Protect", "Zap Cannon", "Focus Blast"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 2.32% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 2.32% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Venusaur": {
@@ -382,7 +382,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Timid",
     sp: { hp: 4, spa: 30, spe: 32 },
     moves: ["Sludge Bomb", "Protect", "Earth Power", "Giga Drain"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 1.82% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 1.82% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Delphox": {
@@ -391,7 +391,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Timid",
     sp: { hp: 4, spa: 30, spe: 32 },
     moves: ["Protect", "Heat Wave", "Nasty Plot", "Psychic"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 1.77% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 1.77% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Tyranitar": {
@@ -400,7 +400,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Jolly",
     sp: { hp: 4, atk: 30, spe: 32 },
     moves: ["Rock Slide", "Knock Off", "Protect", "Low Kick"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 1.50% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 1.50% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Froslass": {
@@ -409,7 +409,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Timid",
     sp: { hp: 4, spa: 30, spe: 32 },
     moves: ["Blizzard", "Protect", "Shadow Ball", "Aurora Veil"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 1.46% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 1.46% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Swampert": {
@@ -418,7 +418,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Jolly",
     sp: { hp: 4, atk: 30, spe: 32 },
     moves: ["Protect", "Wave Crash", "Earthquake", "Ice Punch"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 1.35% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 1.35% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Arcanine-Hisui": {
@@ -427,7 +427,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Jolly",
     sp: { hp: 4, atk: 30, spe: 32 },
     moves: ["Flare Blitz", "Extreme Speed", "Protect", "Head Smash"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 1.27% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 1.27% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Gholdengo": {
@@ -436,7 +436,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Timid",
     sp: { hp: 4, spa: 30, spe: 32 },
     moves: ["Make It Rain", "Shadow Ball", "Protect", "Nasty Plot"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 1.24% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 1.24% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Milotic": {
@@ -445,7 +445,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Timid",
     sp: { hp: 4, spa: 30, spe: 32 },
     moves: ["Scald", "Protect", "Recover", "Muddy Water"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 1.21% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 1.21% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Grimmsnarl": {
@@ -454,7 +454,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Careful",
     sp: { hp: 20, def: 20, spd: 20 },
     moves: ["Light Screen", "Parting Shot", "Reflect", "Spirit Break"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 1.20% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 1.20% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Blastoise": {
@@ -463,7 +463,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Timid",
     sp: { hp: 4, spa: 30, spe: 32 },
     moves: ["Water Spout", "Dark Pulse", "Aura Sphere", "Fake Out"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 1.01% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 1.01% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Torkoal": {
@@ -472,7 +472,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Timid",
     sp: { hp: 4, spa: 30, spe: 32 },
     moves: ["Eruption", "Protect", "Weather Ball", "Heat Wave"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 1.00% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 1.00% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Scovillain": {
@@ -481,7 +481,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Calm",
     sp: { hp: 20, def: 20, spd: 20 },
     moves: ["Protect", "Rage Powder", "Overheat", "Leech Seed"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 0.90% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 0.90% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Excadrill": {
@@ -490,7 +490,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Jolly",
     sp: { hp: 4, atk: 30, spe: 32 },
     moves: ["Iron Head", "Protect", "Rock Slide", "Earthquake"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 0.89% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 0.89% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Ninetales-Alola": {
@@ -499,7 +499,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Timid",
     sp: { hp: 4, spa: 30, spe: 32 },
     moves: ["Blizzard", "Protect", "Freeze-Dry", "Aurora Veil"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 0.84% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 0.84% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Gengar": {
@@ -508,7 +508,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Timid",
     sp: { hp: 4, spa: 30, spe: 32 },
     moves: ["Shadow Ball", "Protect", "Perish Song", "Sludge Bomb"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 0.83% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 0.83% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Lycanroc-Dusk": {
@@ -517,7 +517,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Jolly",
     sp: { hp: 4, atk: 30, spe: 32 },
     moves: ["Accelerock", "Protect", "Close Combat", "Rock Slide"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 0.78% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 0.78% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Politoed": {
@@ -526,7 +526,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Timid",
     sp: { hp: 4, spa: 30, spe: 32 },
     moves: ["Weather Ball", "Protect", "Perish Song", "Ice Beam"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 0.58% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 0.58% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Primarina": {
@@ -535,7 +535,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Timid",
     sp: { hp: 4, spa: 30, spe: 32 },
     moves: ["Hyper Voice", "Protect", "Moonblast", "Calm Mind"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 0.54% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 0.54% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Metagross": {
@@ -544,7 +544,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Jolly",
     sp: { hp: 4, atk: 30, spe: 32 },
     moves: ["Protect", "Psychic Fangs", "Iron Head", "Bullet Punch"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 0.52% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 0.52% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Gardevoir": {
@@ -553,7 +553,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Timid",
     sp: { hp: 4, spa: 30, spe: 32 },
     moves: ["Hyper Voice", "Protect", "Psychic", "Psyshock"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 0.50% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 0.50% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Vivillon": {
@@ -562,7 +562,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Calm",
     sp: { hp: 20, def: 20, spd: 20 },
     moves: ["Sleep Powder", "Hurricane", "Rage Powder", "Tailwind"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 0.49% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 0.49% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Annihilape": {
@@ -571,7 +571,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Jolly",
     sp: { hp: 4, atk: 30, spe: 32 },
     moves: ["Rage Fist", "Protect", "Drain Punch", "Bulk Up"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 0.45% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 0.45% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Kommo-o": {
@@ -580,7 +580,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Timid",
     sp: { hp: 4, spa: 30, spe: 32 },
     moves: ["Clanging Scales", "Protect", "Clangorous Soul", "Aura Sphere"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 0.43% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 0.43% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Blaziken": {
@@ -589,7 +589,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Jolly",
     sp: { hp: 4, atk: 30, spe: 32 },
     moves: ["Close Combat", "Flare Blitz", "Protect", "Detect"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 0.42% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 0.42% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Tsareena": {
@@ -598,7 +598,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Jolly",
     sp: { hp: 4, atk: 30, spe: 32 },
     moves: ["Triple Axel", "Trop Kick", "Protect", "Low Kick"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 0.42% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 0.42% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Hydreigon": {
@@ -607,7 +607,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Timid",
     sp: { hp: 4, spa: 30, spe: 32 },
     moves: ["Dark Pulse", "Draco Meteor", "Snarl", "Earth Power"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 0.39% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 0.39% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Ceruledge": {
@@ -616,7 +616,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Jolly",
     sp: { hp: 4, atk: 30, spe: 32 },
     moves: ["Bitter Blade", "Protect", "Shadow Sneak", "Bulk Up"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 0.36% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 0.36% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Scrafty": {
@@ -625,7 +625,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Jolly",
     sp: { hp: 4, atk: 30, spe: 32 },
     moves: ["Fake Out", "Knock Off", "Drain Punch", "Close Combat"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 0.36% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 0.36% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Corviknight": {
@@ -634,7 +634,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Jolly",
     sp: { hp: 4, atk: 30, spe: 32 },
     moves: ["Brave Bird", "Tailwind", "Iron Head", "Bulk Up"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 0.35% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 0.35% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Scizor": {
@@ -643,7 +643,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Jolly",
     sp: { hp: 4, atk: 30, spe: 32 },
     moves: ["Bullet Punch", "Protect", "Swords Dance", "Bug Bite"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 0.32% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 0.32% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Kangaskhan": {
@@ -652,7 +652,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Jolly",
     sp: { hp: 4, atk: 30, spe: 32 },
     moves: ["Fake Out", "Last Resort", "Double-Edge", "Ice Punch"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 0.30% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 0.30% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Camerupt": {
@@ -661,7 +661,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Timid",
     sp: { hp: 4, spa: 30, spe: 32 },
     moves: ["Earth Power", "Protect", "Heat Wave", "Ancient Power"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 0.29% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 0.29% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Hatterene": {
@@ -670,7 +670,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Calm",
     sp: { hp: 20, def: 20, spd: 20 },
     moves: ["Dazzling Gleam", "Trick Room", "Protect", "Psychic"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 0.29% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 0.29% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Clefable": {
@@ -679,7 +679,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Calm",
     sp: { hp: 20, def: 20, spd: 20 },
     moves: ["Moonblast", "Follow Me", "Protect", "Helping Hand"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 0.26% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 0.26% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Lucario": {
@@ -688,7 +688,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Jolly",
     sp: { hp: 4, atk: 30, spe: 32 },
     moves: ["Close Combat", "Protect", "Final Gambit", "Bullet Punch"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 0.26% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 0.26% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Mimikyu": {
@@ -697,7 +697,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Careful",
     sp: { hp: 20, def: 20, spd: 20 },
     moves: ["Play Rough", "Shadow Sneak", "Trick Room", "Shadow Claw"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 0.24% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 0.24% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Gallade": {
@@ -706,7 +706,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Jolly",
     sp: { hp: 4, atk: 30, spe: 32 },
     moves: ["Sacred Sword", "Psycho Cut", "Protect", "Leaf Blade"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 0.22% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 0.22% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Volcarona": {
@@ -715,7 +715,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Calm",
     sp: { hp: 20, def: 20, spd: 20 },
     moves: ["Heat Wave", "Quiver Dance", "Protect", "Rage Powder"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 0.21% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 0.21% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Gyarados": {
@@ -724,7 +724,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Jolly",
     sp: { hp: 4, atk: 30, spe: 32 },
     moves: ["Waterfall", "Protect", "Dragon Dance", "Crunch"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 0.20% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 0.20% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Azumarill": {
@@ -733,7 +733,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Jolly",
     sp: { hp: 4, atk: 30, spe: 32 },
     moves: ["Play Rough", "Aqua Jet", "Protect", "Belly Drum"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 0.19% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 0.19% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Kleavor": {
@@ -742,7 +742,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Jolly",
     sp: { hp: 4, atk: 30, spe: 32 },
     moves: ["Stone Axe", "X-Scissor", "Close Combat", "Protect"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 0.18% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 0.18% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Armarouge": {
@@ -751,7 +751,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Calm",
     sp: { hp: 20, def: 20, spd: 20 },
     moves: ["Psychic", "Trick Room", "Heat Wave", "Protect"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 0.18% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 0.18% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Samurott-Hisui": {
@@ -760,7 +760,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Jolly",
     sp: { hp: 4, atk: 30, spe: 32 },
     moves: ["Sacred Sword", "Aqua Cutter", "Ceaseless Edge", "Night Slash"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 0.17% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 0.17% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Araquanid": {
@@ -769,7 +769,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Jolly",
     sp: { hp: 4, atk: 30, spe: 32 },
     moves: ["Liquidation", "Wide Guard", "Protect", "Leech Life"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 0.17% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 0.17% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Drampa": {
@@ -778,7 +778,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Timid",
     sp: { hp: 4, spa: 30, spe: 32 },
     moves: ["Hyper Voice", "Protect", "Earth Power", "Calm Mind"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 0.16% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 0.16% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Mamoswine": {
@@ -787,7 +787,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Jolly",
     sp: { hp: 4, atk: 30, spe: 32 },
     moves: ["Ice Shard", "Icicle Crash", "Protect", "High Horsepower"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 0.16% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 0.16% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Meowscarada": {
@@ -796,7 +796,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Jolly",
     sp: { hp: 4, atk: 30, spe: 32 },
     moves: ["Flower Trick", "Triple Axel", "Knock Off", "Sucker Punch"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 0.16% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 0.16% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Zoroark-Hisui": {
@@ -805,7 +805,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Timid",
     sp: { hp: 4, spa: 30, spe: 32 },
     moves: ["Shadow Ball", "Hyper Voice", "Icy Wind", "Bitter Malice"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 0.16% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 0.16% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Meowstic": {
@@ -814,15 +814,15 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Careful",
     sp: { hp: 20, def: 20, spd: 20 },
     moves: ["Fake Out", "Reflect", "Light Screen", "Charm"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 0.14% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 0.14% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Mega Meganium": {
     // Pikalytics' page for this set shows 100% "Meganiumite" and 85% "Modest"
-    // nature — this data describes the Mega form, not base Meganium (the key
+    // nature - this data describes the Mega form, not base Meganium (the key
     // was renamed to match). Ability on that page shows 71% "Overgrow", but
     // that's the pre-Mega base ability as listed on team sheets, same as
-    // Golisopod — the Mega's real/locked ability is "Mega Sol" (see
+    // Golisopod - the Mega's real/locked ability is "Mega Sol" (see
     // megaSpecies.ts), which is what actually applies once Meganium Mega
     // Evolves and is what the damage calc needs here.
     item: "Meganiumite",
@@ -830,7 +830,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Modest",
     sp: { hp: 4, spa: 30, spe: 32 },
     moves: ["Solar Beam", "Weather Ball", "Dazzling Gleam", "Protect"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 0.14% usage) — item/nature re-verified directly against pikalytics.com/pokedex/battledataregmbs3/Meganium (100% Meganiumite, 85% Modest); SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 0.14% usage) - item/nature re-verified directly against pikalytics.com/pokedex/battledataregmbs3/Meganium (100% Meganiumite, 85% Modest); SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Houndstone": {
@@ -839,7 +839,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Careful",
     sp: { hp: 20, def: 20, spd: 20 },
     moves: ["Last Respects", "Protect", "Will-O-Wisp", "Ally Switch"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 0.14% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 0.14% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Snorlax": {
@@ -848,7 +848,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Careful",
     sp: { hp: 20, def: 20, spd: 20 },
     moves: ["Protect", "Fissure", "Yawn", "Stockpile"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 0.14% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 0.14% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Vanilluxe": {
@@ -857,7 +857,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Timid",
     sp: { hp: 4, spa: 30, spe: 32 },
     moves: ["Blizzard", "Freeze-Dry", "Icy Wind", "Aurora Veil"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 0.13% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 0.13% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Weavile": {
@@ -866,7 +866,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Jolly",
     sp: { hp: 4, atk: 30, spe: 32 },
     moves: ["Fake Out", "Knock Off", "Triple Axel", "Protect"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 0.13% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 0.13% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Malamar": {
@@ -875,7 +875,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Jolly",
     sp: { hp: 4, atk: 30, spe: 32 },
     moves: ["Superpower", "Protect", "Knock Off", "Psycho Cut"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 0.13% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 0.13% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Tinkaton": {
@@ -884,7 +884,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Jolly",
     sp: { hp: 4, atk: 30, spe: 32 },
     moves: ["Gigaton Hammer", "Fake Out", "Play Rough", "Encore"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 0.13% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 0.13% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Golurk": {
@@ -893,7 +893,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Jolly",
     sp: { hp: 4, atk: 30, spe: 32 },
     moves: ["Protect", "Headlong Rush", "Poltergeist", "Ice Punch"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 0.12% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 0.12% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Rotom-Heat": {
@@ -902,7 +902,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Timid",
     sp: { hp: 4, spa: 30, spe: 32 },
     moves: ["Overheat", "Volt Switch", "Will-O-Wisp", "Thunderbolt"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 0.12% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 0.12% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Greninja": {
@@ -911,7 +911,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Timid",
     sp: { hp: 4, spa: 30, spe: 32 },
     moves: ["Ice Beam", "Dark Pulse", "Protect", "Grass Knot"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 0.12% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 0.12% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Palafin": {
@@ -920,7 +920,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Jolly",
     sp: { hp: 4, atk: 30, spe: 32 },
     moves: ["Jet Punch", "Wave Crash", "Protect", "Close Combat"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 0.11% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 0.11% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Vileplume": {
@@ -929,7 +929,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Calm",
     sp: { hp: 20, def: 20, spd: 20 },
     moves: ["Sleep Powder", "Sludge Bomb", "After You", "Protect"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 0.11% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 0.11% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Absol": {
@@ -938,7 +938,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Jolly",
     sp: { hp: 4, atk: 30, spe: 32 },
     moves: ["Protect", "Close Combat", "Sucker Punch", "Night Slash"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 0.11% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 0.11% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Sceptile": {
@@ -947,7 +947,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Timid",
     sp: { hp: 4, spa: 30, spe: 32 },
     moves: ["Dragon Pulse", "Earth Power", "Detect", "Energy Ball"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 0.11% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 0.11% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Chandelure": {
@@ -956,7 +956,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Calm",
     sp: { hp: 20, def: 20, spd: 20 },
     moves: ["Shadow Ball", "Heat Wave", "Protect", "Trick Room"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 0.10% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 0.10% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Dragapult": {
@@ -965,7 +965,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Jolly",
     sp: { hp: 4, atk: 30, spe: 32 },
     moves: ["Protect", "Draco Meteor", "Dragon Darts", "Will-O-Wisp"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 0.10% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 0.10% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Altaria": {
@@ -974,7 +974,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Calm",
     sp: { hp: 20, def: 20, spd: 20 },
     moves: ["Tailwind", "Hyper Voice", "Protect", "Will-O-Wisp"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 0.10% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 0.10% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Espathra": {
@@ -983,7 +983,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Calm",
     sp: { hp: 20, def: 20, spd: 20 },
     moves: ["Protect", "Calm Mind", "Lumina Crash", "Baton Pass"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 0.09% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 0.09% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Salazzle": {
@@ -992,7 +992,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Timid",
     sp: { hp: 4, spa: 30, spe: 32 },
     moves: ["Fake Out", "Sludge Bomb", "Heat Wave", "Protect"],
-    source: "Pikalytics live usage feed (Reg M-B S3, 0.08% usage) — item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Reg M-B S3, 0.08% usage) - item/ability/moves decoded from @pkmn/dex ids; SP is a role-based default (not from this feed)",
     spConfirmed: false,
   },
 
@@ -1001,19 +1001,19 @@ export const META_SETS: Record<string, MetaSet> = {
   // 2026 Reg M-C usage feed (pikalytics.com/pokedex/gen9championsvgc2026regmc).
   // That feed doesn't expose nature/EV breakdowns, only items/abilities/moves,
   // so SP/nature here are role-based defaults like the rest of this file's
-  // "(not from this feed)" entries — spConfirmed: false throughout.
+  // "(not from this feed)" entries - spConfirmed: false throughout.
   "Rillaboom": {
     item: "Life Orb",
     ability: "Grassy Surge",
     nature: "Adamant",
     sp: { hp: 4, atk: 30, spe: 32 },
     moves: ["Fake Out", "Grassy Glide", "Wood Hammer", "U-turn"],
-    source: "Pikalytics live usage feed (Champions VGC 2026 Reg M-C) — item 29.2%, ability 99.3%, moves (Fake Out 55.3%, Grassy Glide 37.1%, Wood Hammer 33.5%, U-turn 18.6%); SP/nature are a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Champions VGC 2026 Reg M-C) - item 29.2%, ability 99.3%, moves (Fake Out 55.3%, Grassy Glide 37.1%, Wood Hammer 33.5%, U-turn 18.6%); SP/nature are a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Mega Salamence": {
     // Pikalytics' page shows this under base "Salamence" with 98% Salamencite
-    // and 98% Intimidate — same pattern as Golisopod/Meganium: that's the
+    // and 98% Intimidate - same pattern as Golisopod/Meganium: that's the
     // pre-Mega team-sheet ability, not the Mega's real one. The Mega's actual
     // ability (megaSpecies.ts) is Aerilate, used here instead.
     item: "Salamencite",
@@ -1021,7 +1021,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Naive",
     sp: { hp: 4, atk: 12, spa: 18, spe: 32 },
     moves: ["Hyper Voice", "Protect", "Tailwind", "Double-Edge"],
-    source: "Pikalytics live usage feed (Champions VGC 2026 Reg M-C, as base 'Salamence') — item 98.1%, moves (Hyper Voice 55.0%, Protect 40.4%, Tailwind 22.8%, Double-Edge 16.8%); ability corrected to the Mega's real ability; SP/nature are a role-based mixed-attacker default (not from this feed)",
+    source: "Pikalytics live usage feed (Champions VGC 2026 Reg M-C, as base 'Salamence') - item 98.1%, moves (Hyper Voice 55.0%, Protect 40.4%, Tailwind 22.8%, Double-Edge 16.8%); ability corrected to the Mega's real ability; SP/nature are a role-based mixed-attacker default (not from this feed)",
     spConfirmed: false,
   },
   "Mega Baxcalibur": {
@@ -1030,7 +1030,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Adamant",
     sp: { hp: 4, atk: 30, spe: 32 },
     moves: ["Protect", "Glaive Rush", "Ice Shard", "Icicle Crash"],
-    source: "Pikalytics live usage feed (Champions VGC 2026 Reg M-C, as base 'Baxcalibur') — item 88.8%, ability 78.1% (matches the Mega's real ability here), moves (Protect 49.6%, Glaive Rush 48.5%, Ice Shard 34.3%, Icicle Crash 17.6%); SP/nature are a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Champions VGC 2026 Reg M-C, as base 'Baxcalibur') - item 88.8%, ability 78.1% (matches the Mega's real ability here), moves (Protect 49.6%, Glaive Rush 48.5%, Ice Shard 34.3%, Icicle Crash 17.6%); SP/nature are a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Mega Hawlucha": {
@@ -1042,7 +1042,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Jolly",
     sp: { hp: 4, atk: 30, spe: 32 },
     moves: ["Entrainment", "Acrobatics", "Close Combat", "Protect"],
-    source: "Pikalytics live usage feed (Champions VGC 2026 Reg M-C, as base 'Hawlucha') — item 60.7%, moves (Entrainment 32.6%, Acrobatics 19.9%, Close Combat 16.3%, Protect 15.0%); ability corrected to the Mega's real ability; SP/nature are a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Champions VGC 2026 Reg M-C, as base 'Hawlucha') - item 60.7%, moves (Entrainment 32.6%, Acrobatics 19.9%, Close Combat 16.3%, Protect 15.0%); ability corrected to the Mega's real ability; SP/nature are a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Zoroark": {
@@ -1051,7 +1051,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Timid",
     sp: { hp: 4, spa: 30, spe: 32 },
     moves: ["Night Daze", "Dark Pulse", "Snarl", "Protect"],
-    source: "Pikalytics live usage feed (Champions VGC 2026 Reg M-C) — item 40% Life Orb, all 4 moves shown at 100% usage in the table; ability is Zoroark's only real ability (Illusion); SP/nature are a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Champions VGC 2026 Reg M-C) - item 40% Life Orb, all 4 moves shown at 100% usage in the table; ability is Zoroark's only real ability (Illusion); SP/nature are a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Krookodile": {
@@ -1060,7 +1060,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Adamant",
     sp: { hp: 4, atk: 30, spe: 32 },
     moves: ["Earthquake", "Knock Off", "High Horsepower", "Protect"],
-    source: "Pikalytics live usage feed (Champions VGC 2026 Reg M-C) — item 48.8%, ability 76.3%, moves (Earthquake 27.5%, Knock Off 22.2%, High Horsepower 15.7%, Protect 13.4%); SP/nature are a role-based default (not from this feed)",
+    source: "Pikalytics live usage feed (Champions VGC 2026 Reg M-C) - item 48.8%, ability 76.3%, moves (Earthquake 27.5%, Knock Off 22.2%, High Horsepower 15.7%, Protect 13.4%); SP/nature are a role-based default (not from this feed)",
     spConfirmed: false,
   },
   "Skeledirge": {
@@ -1069,7 +1069,7 @@ export const META_SETS: Record<string, MetaSet> = {
     nature: "Calm",
     sp: { hp: 30, def: 4, spd: 32 },
     moves: ["Torch Song", "Will-O-Wisp", "Protect", "Slack Off"],
-    source: "Pikalytics live usage feed (Champions VGC 2026 Reg M-C) — item 42.9% Sitrus Berry, moves (Torch Song 64.3%, Will-O-Wisp 28.6%, Protect 21.4%, Slack Off/Earth Power tied 14.3% — Slack Off picked as the more universally useful 4th slot); ability data unavailable on the feed, Unaware used as Skeledirge's standard bulky-support ability; SP/nature are a role-based bulky-support default (not from this feed)",
+    source: "Pikalytics live usage feed (Champions VGC 2026 Reg M-C) - item 42.9% Sitrus Berry, moves (Torch Song 64.3%, Will-O-Wisp 28.6%, Protect 21.4%, Slack Off/Earth Power tied 14.3% - Slack Off picked as the more universally useful 4th slot); ability data unavailable on the feed, Unaware used as Skeledirge's standard bulky-support ability; SP/nature are a role-based bulky-support default (not from this feed)",
     spConfirmed: false,
   },
 };

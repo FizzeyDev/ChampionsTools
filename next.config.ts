@@ -16,7 +16,7 @@ const nextConfig: NextConfig = {
   basePath,
   assetPrefix: basePath,
   env: {
-    // Exposed to client code (see src/lib/sprites.ts) so hardcoded
+    // Exposed to client code (see src/lib/app/sprites.ts) so hardcoded
     // root-relative paths to our own /public files still resolve under a
     // subpath deployment.
     NEXT_PUBLIC_BASE_PATH: basePath,

@@ -1,4 +1,4 @@
-import type { FieldState, PokemonState } from "../types";
+import type { FieldState, PokemonState } from "../calc/types";
 
 const WEATHER_ABILITIES: Record<string, string> = {
   Drought: "Sun",
@@ -17,7 +17,7 @@ const TERRAIN_ABILITIES: Record<string, string> = {
 /**
  * When "ability triggered" is checked on a Pokémon whose ability sets the
  * weather or terrain (Drought, Drizzle, Electric Surge...), this returns
- * the Field patch that turns that weather/terrain on — but only if the
+ * the Field patch that turns that weather/terrain on - but only if the
  * field doesn't already have a different one set, so it never clobbers an
  * intentional setup from another Pokémon or a manual choice. Unchecking it
  * reverts the field, but only if it still matches exactly what this

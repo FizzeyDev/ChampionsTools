@@ -1,6 +1,6 @@
 import { META_SETS } from "../src/lib/champions/metaSets";
 import { getChampionsMoveset } from "../src/lib/champions/moveset";
-import { SPECIES_NAMES } from "../src/lib/gen";
+import { SPECIES_NAMES } from "../src/lib/calc/gen";
 import { getMegaStoneItem } from "../src/lib/features/megaStoneLookup";
 import { getSpeciesAbilities } from "../src/lib/features/speciesAbilities";
 import { HOLD_ITEMS, MEGA_STONES, NEW_MEGA_STONES, BERRIES } from "../src/lib/champions/items";

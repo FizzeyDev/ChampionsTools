@@ -1,6 +1,6 @@
 import { getChampionsMoveset } from "../champions/moveset";
-import { computeMoveResults, type MoveResult } from "../calcEngine";
-import type { PokemonState, FieldState } from "../types";
+import { computeMoveResults, type MoveResult } from "../calc/calcEngine";
+import type { PokemonState, FieldState } from "../calc/types";
 
 /**
  * Computes damage for every move in the attacker's real movepool (not just

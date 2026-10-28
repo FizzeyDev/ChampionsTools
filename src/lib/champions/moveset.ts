@@ -1,11 +1,12 @@
 import { Dex } from "@pkmn/dex";
-import { gen } from "../gen";
+import { gen } from "../calc/gen";
 import { champGen } from "./megaSpecies";
 import { getMetaSet } from "./metaSets";
+import { EXTRA_MOVES, REMOVED_MOVES } from "./corrections";
 
 const cache = new Map<string, Promise<Set<string>>>();
 
-/** Mega forms don't have their own learnset entry — they use their base
+/** Mega forms don't have their own learnset entry - they use their base
  * species' moveset unchanged, so resolve to that first. */
 function resolveLearnsetId(species: string): string {
   const id = species.toLowerCase().replace(/[^a-z0-9]/g, "");
@@ -29,7 +30,7 @@ async function fetchMoveset(learnsetId: string): Promise<Set<string>> {
       // method strings look like "9L30", "9M", "9E", "9T"... (gen prefix 9).
       if (methods.some((m) => m.startsWith("9"))) gen9Names.add(move.name);
     }
-    // Species not in SV's own regional dex (e.g. Absol, Beedrill, Alakazam —
+    // Species not in SV's own regional dex (e.g. Absol, Beedrill, Alakazam -
     // the same "Past"-tagged species from the sprite fix) have zero
     // gen9-tagged moves even though Champions lets them use their full
     // historical movepool. Fall back to the complete learnset for those.
@@ -46,7 +47,7 @@ async function fetchMoveset(learnsetId: string): Promise<Set<string>> {
  * metaSets.ts), if it has one. Those are real, sourced competitive moves
  * (Pikalytics/tournament teams), and @pkmn/dex's bundled learnset data
  * turns out to be missing some well-documented Gen 9 movepool entries
- * outright — e.g. its Kingambit entry has no Sucker Punch at all, not even
+ * outright - e.g. its Kingambit entry has no Sucker Punch at all, not even
  * tagged to an older gen, almost certainly a data gap rather than Kingambit
  * really being unable to learn it. Without this union, a verified
  * real-world move could get flagged as "unusual" in the UI purely because
@@ -63,6 +64,15 @@ export async function getChampionsMoveset(species: string): Promise<Set<string>>
   }
   const learned = await cache.get(key)!;
   const metaMoves = getMetaSet(species)?.moves.filter(Boolean) ?? [];
-  if (metaMoves.length === 0) return learned;
-  return new Set([...learned, ...metaMoves]);
+  // Manual corrections (corrections.ts) are keyed by base-species name.
+  const baseName = (champGen.species.get(species.toLowerCase().replace(/[^a-z0-9]/g, "")) as
+    | { baseSpecies?: string }
+    | undefined)?.baseSpecies || species;
+  const extra = EXTRA_MOVES[baseName] ?? [];
+  const removed = new Set(REMOVED_MOVES[baseName] ?? []);
+  if (metaMoves.length === 0 && extra.length === 0 && removed.size === 0) return learned;
+  const merged = new Set([...learned, ...extra, ...metaMoves]);
+  // Removed moves never override a move a curated, sourced set really uses.
+  for (const m of removed) if (!metaMoves.includes(m)) merged.delete(m);
+  return merged;
 }

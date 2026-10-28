@@ -14,6 +14,6 @@ export function saveNotes(text: string) {
   try {
     window.localStorage.setItem(STORAGE_KEY, text);
   } catch {
-    // storage full or unavailable — silently ignore
+    // storage full or unavailable - silently ignore
   }
 }

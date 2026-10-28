@@ -1,8 +1,8 @@
-import { gen } from "../gen";
+import { gen } from "../calc/gen";
 import { champGen } from "./megaSpecies";
 
 /** Official short description of a move, ability, or item, straight from
- * the game data — used as tooltips/dropdown subtitles so people don't have
+ * the game data - used as tooltips/dropdown subtitles so people don't have
  * to leave the site to check what something does. Returns "" if unknown. */
 export function getMoveDescription(name: string): string {
   const m = gen.moves.get(name);

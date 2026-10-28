@@ -1,4 +1,4 @@
-import type { PokemonState } from "../types";
+import type { PokemonState } from "../calc/types";
 
 const STORAGE_KEY = "champcalc.savedPokemon";
 
@@ -26,7 +26,7 @@ function writeAll(entries: SavedPokemon[]) {
   try {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
   } catch {
-    // storage full or unavailable — silently ignore
+    // storage full or unavailable - silently ignore
   }
 }
 

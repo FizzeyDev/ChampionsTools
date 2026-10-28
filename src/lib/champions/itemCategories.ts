@@ -15,7 +15,7 @@ export const ITEM_CATEGORY_ORDER: ItemCategory[] = [
 // Best-effort classification of held items into the categories Champions'
 // own item menu uses (Recovery / Power Boost / Stat Boost / Effect Extend),
 // based on each item's known effect. Mega Stones and Berries are their own
-// pockets in-game, same as here. Not datamined — if a specific item's menu
+// pockets in-game, same as here. Not datamined - if a specific item's menu
 // placement turns out different in-game, it's easy to move it below.
 const RECOVERY = new Set([
   "Leftovers",

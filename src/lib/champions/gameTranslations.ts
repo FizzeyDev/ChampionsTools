@@ -1,16 +1,16 @@
 // Official French names for every species/move/ability/item this app uses,
 // sourced in bulk from PokeAPI's own localization data (raw.githubusercontent
-// .com/PokeAPI/pokeapi, data/v2/csv/*_names.csv — the same CSVs that power
+// .com/PokeAPI/pokeapi, data/v2/csv/*_names.csv - the same CSVs that power
 // pokeapi.co) rather than typed by hand. Two exceptions, clearly marked
 // below by comment: Mega Stones and Mega forms *exclusive to Champions*
 // (never in a released, localized game) have no official French name to
-// source — those are constructed by hand following the exact pattern every
+// source - those are constructed by hand following the exact pattern every
 // real Mega uses ("Méga-Dracaufeu X" -> "Méga-[FR name] [suffix]" for
 // species, "[FR name]ite" for stones), so treat those specific entries as
 // best-effort, not verified official text.
 //
 // Regenerate by re-running the extraction against a fresh CSV pull if the
-// game adds new species/moves/items — see the project chat history for the
+// game adds new species/moves/items - see the project chat history for the
 // extraction script.
 
 export const SPECIES_FR: Record<string, string> = {
@@ -671,6 +671,7 @@ export const MOVES_FR: Record<string, string> = {
   "Jet Punch": "Poing Sonique",
   "Judgment": "Jugement",
   "Jungle Healing": "Selve Salvatrice",
+  "King's Shield": "Bouclier Royal",
   "Knock Off": "Sabotage",
   "Kowtow Cleave": "Génusection",
   "Lash Out": "Cent Rancunes",
@@ -1344,6 +1345,13 @@ export const ABILITIES_FR: Record<string, string> = {
   "Wonder Skin": "Peau Miracle",
   "Zen Mode": "Mode Transe",
   "Zero to Hero": "Supermutation",
+  // New Champions abilities (French names from Pokébip's "nouveaux talents" list)
+  "Aura Guard": "Aura Protectrice",
+  "Dragonize": "Peau Draconique",
+  "Eelevate": "Lévitaboost",
+  "Fire Mane": "Crinière de Feu",
+  "Mega Sol": "Méga-Soleil",
+  "Piercing Drill": "Transperceuse",
 };
 
 export const ITEMS_FR: Record<string, string> = {
@@ -1590,10 +1598,10 @@ for (const kind of Object.keys(TABLES) as Kind[]) {
 }
 
 /** English canonical name -> French name for display. Falls back to the
- * English name itself if untranslated (should be rare — coverage is
+ * English name itself if untranslated (should be rare - coverage is
  * essentially complete for everything actually selectable in the app). */
 /** English canonical name -> French name for display. Falls back to the
- * English name itself if untranslated (should be rare — coverage is
+ * English name itself if untranslated (should be rare - coverage is
  * essentially complete for everything actually selectable in the app). */
 export function toFrench(kind: Kind, enName: string): string {
   return TABLES[kind][enName] ?? enName;
@@ -1611,7 +1619,7 @@ function foldAccents(s: string): string {
   return s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 }
 
-/** True if `query` matches `enName` in either language — used so search
+/** True if `query` matches `enName` in either language - used so search
  * works regardless of the site's current UI language (e.g. typing
  * "Sarmurai" finds Golisopod even with the English interface active, and
  * "Golisopod" still works with the French interface active). Accents are

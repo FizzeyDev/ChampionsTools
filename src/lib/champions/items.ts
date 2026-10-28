@@ -1,6 +1,6 @@
 // Exact item pool for Pokémon Champions, curated from the in-game item list
 // (Serebii's Champions ItemDex, cross-checked against the game's own item
-// listing). This is deliberately NOT the full Gen 9 competitive item pool —
+// listing). This is deliberately NOT the full Gen 9 competitive item pool -
 // Champions launched with a smaller, more classic set. Notably absent versus
 // modern VGC: Choice Band, Choice Specs, Assault Vest, Heavy-Duty Boots,
 // Rocky Helmet, Eviolite, Booster Energy, Covert Cloak, Loaded Dice, Safety
@@ -101,7 +101,7 @@ export const BERRIES = [
 
 // Every Mega Stone confirmed in the Champions item list, mapped to the
 // species it activates. Not every one of these has playable Mega stats wired
-// up yet in MEGA_SPECIES below (see champions/megaSpecies.ts) — holding an
+// up yet in MEGA_SPECIES below (see champions/megaSpecies.ts) - holding an
 // unsupported stone just acts as a normal (no-effect) held item for now.
 export const MEGA_STONES: { item: string; species: string }[] = [
   { item: "Abomasite", species: "Abomasnow" },
@@ -181,13 +181,13 @@ export const MEGA_STONES: { item: string; species: string }[] = [
   { item: "Victreebelite", species: "Victreebel" },
 ];
 
-// Reg M-C additions — names confirmed against Bulbapedia's Mega Stone
+// Reg M-C additions - names confirmed against Bulbapedia's Mega Stone
 // category listing (not guessed).
 export const NEW_MEGA_STONES: { item: string; species: string }[] = [
   { item: "Salamencite", species: "Salamence" },
   { item: "Golisopite", species: "Golisopod" },
   { item: "Baxcalibrite", species: "Baxcalibur" },
-  // "Z" stones: Absol, Garchomp and Lucario each have TWO distinct stones —
+  // "Z" stones: Absol, Garchomp and Lucario each have TWO distinct stones -
   // the classic one (unlocks the ORAS-era Mega) and this one (unlocks the
   // Champions/Mega Dimension "Z" forme). Confirmed via Bulbapedia.
   { item: "Absolite Z", species: "Absol" },

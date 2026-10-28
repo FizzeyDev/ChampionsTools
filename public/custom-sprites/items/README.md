@@ -2,7 +2,7 @@
 
 Ces objets n'existent pas encore dans la base d'images publique PokeAPI (ce
 sont soit des objets exclusifs à Champions, soit trop récents). L'appli
-cherche automatiquement une image ici avant d'abandonner — dépose un PNG avec
+cherche automatiquement une image ici avant d'abandonner - dépose un PNG avec
 EXACTEMENT le nom de fichier ci-dessous et ça s'affichera tout seul, sans
 toucher au code.
 

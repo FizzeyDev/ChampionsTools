@@ -3,20 +3,20 @@
 
 :root {
   /* Surfaces */
-  --color-paper: #090f10;
-  --color-panel: #101a1b;
-  --color-panel-soft: #152122;
-  --color-panel-strong: #1d2e2f;
+  --color-paper: #070a1b;
+  --color-panel: #0e1530;
+  --color-panel-soft: #141d3f;
+  --color-panel-strong: #1e2a56;
 
   /* Text */
-  --color-ink: #cfe0e2;
-  --color-ink-bright: #eaf6f7;
-  --color-ink-soft: #8aacaf;
-  --color-ink-dim: #5a7577;
+  --color-ink: #d4def5;
+  --color-ink-bright: #f0f5ff;
+  --color-ink-soft: #94a8d6;
+  --color-ink-dim: #6b7eae;
 
   /* Borders */
-  --color-line: rgba(255, 255, 255, 0.09);
-  --color-line-strong: rgba(255, 255, 255, 0.16);
+  --color-line: rgba(150, 170, 255, 0.12);
+  --color-line-strong: rgba(150, 170, 255, 0.22);
 
   /* Accent: Attaquant */
   --color-league: #4fc3f7;
@@ -40,8 +40,23 @@
   --color-amber-soft: rgba(255, 215, 64, 0.14);
   --color-danger: #ef5350;
   --color-danger-soft: rgba(239, 83, 80, 0.14);
-  --color-success: #4caf82;
+  --color-success: #4cd08a;
   --color-success-soft: rgba(76, 175, 130, 0.14);
+
+  /* Sidebar + stadium accents */
+  --color-sidebar: #080d24;
+  --color-gold: #ffc233;
+  --gradient-champion: linear-gradient(100deg, #4fc3f7 0%, #9f53ec 52%, #ffb000 100%);
+
+  --tint-faint: rgba(255, 255, 255, 0.025);
+  --tint-line: rgba(255, 255, 255, 0.05);
+  --pattern-opacity: 1;
+  --sidebar-shadow: 4px 0 24px rgba(0, 0, 0, 0.6);
+  --ui-scale: 1;
+  --backdrop:
+    radial-gradient(1100px 560px at 8% -8%, rgba(110, 70, 255, 0.22), transparent 62%),
+    radial-gradient(900px 520px at 100% 0%, rgba(79, 195, 247, 0.12), transparent 58%),
+    radial-gradient(800px 500px at 50% 115%, rgba(255, 176, 0, 0.07), transparent 60%);
 
   --radius-lg: 14px;
   --radius-md: 10px;
@@ -91,7 +106,8 @@
 
 html,
 body {
-  background: var(--color-paper);
+  background: var(--backdrop), var(--color-paper);
+  background-attachment: fixed;
   color: var(--color-ink);
   font-family: var(--font-body);
 }
@@ -99,14 +115,17 @@ body {
 /* Phones: scale the whole rem-based sizing system down (padding, gaps, most
    text) so more fits on screen without stacking everything into an endless
    single column. Cards stay full readable width, just less padded/large. */
+html {
+  font-size: calc(16px * var(--ui-scale));
+}
 @media (max-width: 640px) {
   html {
-    font-size: 13px;
+    font-size: calc(13px * var(--ui-scale));
   }
 }
 @media (max-width: 400px) {
   html {
-    font-size: 12px;
+    font-size: calc(12px * var(--ui-scale));
   }
 }
 
@@ -114,16 +133,19 @@ body {
   position: relative;
 }
 
-/* Subtle blueprint grid, matching the rest of the site */
+/* Stadium backdrop: faint diagonal light streaks over a very soft grid */
 body::before {
   content: "";
   position: fixed;
   inset: 0;
-  background-image: linear-gradient(rgba(79, 195, 247, 0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(79, 195, 247, 0.02) 1px, transparent 1px);
-  background-size: 40px 40px;
+  background-image:
+    repeating-linear-gradient(115deg, rgba(160, 180, 255, 0.025) 0 2px, transparent 2px 46px),
+    linear-gradient(rgba(79, 195, 247, 0.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(79, 195, 247, 0.018) 1px, transparent 1px);
+  background-size: auto, 40px 40px, 40px 40px;
   pointer-events: none;
   z-index: 0;
+  opacity: var(--pattern-opacity);
 }
 
 #__next,
@@ -198,7 +220,8 @@ input[type="range"]::-moz-range-thumb {
   font-family: var(--font-display);
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  font-weight: 700;
+  font-weight: 800;
+  font-style: italic;
 }
 
 .eyebrow {
@@ -211,10 +234,24 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .card-shell {
-  background: var(--color-panel);
+  position: relative;
+  background: linear-gradient(180deg, var(--color-panel-soft) 0%, var(--color-panel) 38%);
   border: 1px solid var(--color-line);
-  border-radius: var(--radius-lg);
+  border-radius: 16px 6px 16px 6px;
   box-shadow: var(--shadow-md);
+}
+/* thin tri-color edge along the top of every card */
+.card-shell::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: 14px;
+  right: 14px;
+  height: 2px;
+  background: var(--gradient-champion);
+  border-radius: 2px;
+  opacity: 0.7;
+  pointer-events: none;
 }
 
 .field-input {
@@ -239,9 +276,9 @@ input[type="range"]::-moz-range-thumb {
   letter-spacing: 0.05em;
   text-transform: uppercase;
   padding: 8px 16px;
-  border-radius: 999px;
+  border-radius: 4px 14px 4px 14px;
   border: 1px solid var(--color-line-strong);
-  background: var(--color-panel-soft);
+  background: linear-gradient(180deg, var(--color-panel-strong), var(--color-panel-soft));
   color: var(--color-ink-soft);
   cursor: pointer;
   transition: all 0.2s ease;
@@ -253,7 +290,14 @@ input[type="range"]::-moz-range-thumb {
 .pill-btn:hover {
   transform: translateY(-1px);
   color: var(--color-ink-bright);
-  border-color: var(--color-line-strong);
+  border-color: var(--color-league);
+  box-shadow: 0 0 14px var(--color-league-glow);
+}
+.pill-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 /* Custom checkbox: square, glows in the accent color when checked.
@@ -295,4 +339,156 @@ input[type="range"]::-moz-range-thumb {
 .field-checkbox:focus-visible {
   outline: 2px solid var(--checkbox-accent, var(--color-league));
   outline-offset: 1px;
+}
+
+/* ------------------------------------------------------------------ */
+/* Settings: themes + display options (set on <html> by lib/settings)  */
+/* ------------------------------------------------------------------ */
+
+/* Soft dark: neutral blue-grey, low saturation, easiest on the eyes */
+:root[data-theme="midnight"] {
+  --color-paper: #12141c;
+  --color-panel: #1a1d28;
+  --color-panel-soft: #222636;
+  --color-panel-strong: #2c3144;
+  --color-ink: #cfd5e6;
+  --color-ink-bright: #eef1fa;
+  --color-ink-soft: #9aa3bd;
+  --color-ink-dim: #7d86a1;
+  --color-line: rgba(170, 180, 215, 0.12);
+  --color-line-strong: rgba(170, 180, 215, 0.22);
+  --color-league: #6fb7e0;
+  --color-league-dark: #4d94bd;
+  --color-league-soft: rgba(111, 183, 224, 0.14);
+  --color-league-glow: rgba(111, 183, 224, 0.2);
+  --color-brick: #e8a24a;
+  --color-brick-dark: #bd7f2f;
+  --color-brick-soft: rgba(232, 162, 74, 0.14);
+  --color-brick-glow: rgba(232, 162, 74, 0.2);
+  --color-violet: #9a86d6;
+  --color-sidebar: #0e1017;
+  --gradient-champion: linear-gradient(100deg, #6fb7e0 0%, #9a86d6 52%, #e8a24a 100%);
+  --backdrop: radial-gradient(1000px 500px at 10% -10%, rgba(120, 130, 200, 0.1), transparent 62%);
+  --pattern-opacity: 0.5;
+}
+
+/* Neutral grey, no blue cast */
+:root[data-theme="graphite"] {
+  --color-paper: #151515;
+  --color-panel: #1e1e20;
+  --color-panel-soft: #28282b;
+  --color-panel-strong: #343438;
+  --color-ink: #d8d8da;
+  --color-ink-bright: #f4f4f5;
+  --color-ink-soft: #a0a0a6;
+  --color-ink-dim: #80808a;
+  --color-line: rgba(255, 255, 255, 0.1);
+  --color-line-strong: rgba(255, 255, 255, 0.2);
+  --color-league: #7cc4e8;
+  --color-league-dark: #58a0c4;
+  --color-league-soft: rgba(124, 196, 232, 0.14);
+  --color-league-glow: rgba(124, 196, 232, 0.2);
+  --color-brick: #f0a63a;
+  --color-brick-dark: #c4842a;
+  --color-violet: #a98ae0;
+  --color-sidebar: #101011;
+  --gradient-champion: linear-gradient(100deg, #7cc4e8 0%, #a98ae0 52%, #f0a63a 100%);
+  --backdrop: none;
+  --pattern-opacity: 0;
+}
+
+/* Deep teal-green */
+:root[data-theme="ocean"] {
+  --color-paper: #0a1a1f;
+  --color-panel: #10262d;
+  --color-panel-soft: #163238;
+  --color-panel-strong: #1e4048;
+  --color-ink: #cfe6e8;
+  --color-ink-bright: #effafb;
+  --color-ink-soft: #92b9be;
+  --color-ink-dim: #6f9aa0;
+  --color-line: rgba(140, 220, 225, 0.12);
+  --color-line-strong: rgba(140, 220, 225, 0.22);
+  --color-league: #4dd0c4;
+  --color-league-dark: #2fa89e;
+  --color-league-soft: rgba(77, 208, 196, 0.14);
+  --color-league-glow: rgba(77, 208, 196, 0.22);
+  --color-brick: #ffb347;
+  --color-violet: #7aa2f7;
+  --color-sidebar: #08151a;
+  --gradient-champion: linear-gradient(100deg, #4dd0c4 0%, #7aa2f7 52%, #ffb347 100%);
+  --backdrop: radial-gradient(1000px 520px at 90% -10%, rgba(77, 208, 196, 0.1), transparent 60%);
+  --pattern-opacity: 0.6;
+}
+
+/* Pure black, for OLED screens */
+:root[data-theme="amoled"] {
+  --color-paper: #000000;
+  --color-panel: #0b0b0f;
+  --color-panel-soft: #14141a;
+  --color-panel-strong: #1e1e27;
+  --color-sidebar: #000000;
+  --backdrop: none;
+  --pattern-opacity: 0;
+}
+
+/* Light */
+:root[data-theme="light"] {
+  --color-paper: #eef1f8;
+  --color-panel: #ffffff;
+  --color-panel-soft: #f3f5fb;
+  --color-panel-strong: #e2e7f3;
+  --color-ink: #28324a;
+  --color-ink-bright: #0d1428;
+  --color-ink-soft: #4b5878;
+  --color-ink-dim: #66728f;
+  --color-line: rgba(40, 60, 120, 0.14);
+  --color-line-strong: rgba(40, 60, 120, 0.26);
+  --color-league: #0b7fb8;
+  --color-league-dark: #07608c;
+  --color-league-soft: rgba(11, 127, 184, 0.12);
+  --color-league-glow: rgba(11, 127, 184, 0.2);
+  --color-brick: #c26a00;
+  --color-brick-dark: #965100;
+  --color-brick-soft: rgba(194, 106, 0, 0.12);
+  --color-brick-glow: rgba(194, 106, 0, 0.2);
+  --color-violet: #7a3fc4;
+  --color-violet-soft: rgba(122, 63, 196, 0.12);
+  --color-amber: #a37800;
+  --color-amber-soft: rgba(163, 120, 0, 0.14);
+  --color-danger: #c62828;
+  --color-danger-soft: rgba(198, 40, 40, 0.12);
+  --color-success: #1b8a55;
+  --color-success-soft: rgba(27, 138, 85, 0.12);
+  --color-sidebar: #e3e8f3;
+  --color-gold: #b07a00;
+  --gradient-champion: linear-gradient(100deg, #0b7fb8 0%, #7a3fc4 52%, #c26a00 100%);
+  --tint-faint: rgba(20, 40, 100, 0.03);
+  --tint-line: rgba(20, 40, 100, 0.09);
+  --sidebar-shadow: 4px 0 18px rgba(30, 45, 100, 0.14);
+  --shadow-lg: 0 8px 28px rgba(30, 45, 100, 0.16);
+  --shadow-md: 0 3px 12px rgba(30, 45, 100, 0.12);
+  --shadow-sm: 0 2px 6px rgba(30, 45, 100, 0.1);
+  --backdrop: none;
+  --pattern-opacity: 0;
+}
+
+html[data-text="small"] { --ui-scale: 0.92; }
+html[data-text="large"] { --ui-scale: 1.12; }
+html[data-text="xlarge"] { --ui-scale: 1.25; }
+
+html[data-backdrop="off"] { --backdrop: none; --pattern-opacity: 0; }
+
+html[data-font="clean"] {
+  --font-display: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-body: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+html[data-font="clean"] .heading { font-style: normal; }
+
+html[data-motion="reduce"] *,
+html[data-motion="reduce"] *::before,
+html[data-motion="reduce"] *::after {
+  animation: none !important;
+  transition: none !important;
+  scroll-behavior: auto !important;
 }

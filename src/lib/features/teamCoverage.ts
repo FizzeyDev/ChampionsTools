@@ -1,9 +1,9 @@
-import { TYPE_NAMES } from "../gen";
-import { computeTypeChart } from "../typeChart";
-import { speciesTypes, moveInfo } from "../sprites";
-import { computeStats } from "../calcEngine";
+import { TYPE_NAMES } from "../calc/gen";
+import { computeTypeChart } from "../calc/typeChart";
+import { speciesTypes, moveInfo } from "../app/sprites";
+import { computeStats } from "../calc/calcEngine";
 import { META_SETS } from "../champions/metaSets";
-import type { PokemonState } from "../types";
+import type { PokemonState } from "../calc/types";
 
 export type WeaknessLabel = "veryWeak" | "weak" | "resist" | "veryResist";
 
@@ -34,10 +34,10 @@ export interface TeamAnalysis {
   threatsToTeam: ThreatEntry[]; // meta Pokémon strong against the team
   teamThreatens: ThreatEntry[]; // meta Pokémon weak to the team
   /** The attacking types the team's current moves (or, for empty slots,
-   * species types as a stand-in) actually cover — this is the one part of
+   * species types as a stand-in) actually cover - this is the one part of
    * the analysis that reacts to the moves you pick. Note: the "weaknesses"
    * above are purely about the team's own defensive typing and never
-   * change based on moves — that's by design, not a bug. */
+   * change based on moves - that's by design, not a bug. */
   offensiveCoverage: string[];
 }
 

@@ -1,6 +1,6 @@
-import { computeMoveResults, computeStats } from "../calcEngine";
+import { computeMoveResults, computeStats } from "../calc/calcEngine";
 import { spToEv, STAT_POINT_CAP } from "../champions/statPoints";
-import type { FieldState, PokemonState } from "../types";
+import type { FieldState, PokemonState } from "../calc/types";
 
 export interface ReverseCalcResult {
   /** The defensive stat used to survive, or offensive stat used to KO. */
@@ -14,7 +14,7 @@ export interface ReverseCalcResult {
 /**
  * Minimum Stat Points the defender needs in its relevant defensive stat
  * (Def for Physical moves, SpD for Special) to guarantee surviving this
- * exact move — i.e. the highest damage roll stays below current HP. Every
+ * exact move - i.e. the highest damage roll stays below current HP. Every
  * other stat/investment on both sides is held fixed.
  */
 export function minSpToSurvive(
@@ -43,7 +43,7 @@ export function minSpToSurvive(
 /**
  * Minimum Stat Points the attacker needs in its relevant offensive stat
  * (Atk for Physical moves, SpA for Special) to guarantee an OHKO with this
- * exact move — i.e. the lowest damage roll already meets or exceeds the
+ * exact move - i.e. the lowest damage roll already meets or exceeds the
  * defender's current HP.
  */
 export function minSpToOhko(

@@ -4,9 +4,9 @@ import { getMegaStoneItem } from "./megaStoneLookup";
 import { getMetaSet } from "../champions/metaSets";
 import { spToEv } from "../champions/statPoints";
 import { suggestMoves } from "./suggestMoves";
-import { defaultStats } from "../types";
-import type { PokemonState } from "../types";
-import type { StatKey } from "../gen";
+import { defaultStats } from "../calc/types";
+import type { PokemonState } from "../calc/types";
+import type { StatKey } from "../calc/gen";
 
 /**
  * Returns the given state with species, ability, held item (+ lock for
@@ -21,7 +21,7 @@ import type { StatKey } from "../gen";
  * status are all always reset on a species switch (falling back to a flat
  * 0-SP spread, no item/ability and a clean battle state when no curated set
  * exists) rather than carried over from `base`. Otherwise a previous
- * species' build silently survives onto the new one — invisible unless you
+ * species' build silently survives onto the new one - invisible unless you
  * go check each field, and confusing when it does: an old held item, Tera
  * type or status condition staying active is exactly what was behind the
  * "Pokémon tank more or less than they should after switching around a
@@ -35,7 +35,7 @@ export async function autofillForSpecies(
   const metaSet = getMetaSet(newSpecies);
   const resetBoosts = defaultStats(0);
   // Battle-state fields that belong to the Pokémon being tested, not to
-  // whatever was being tested before it — reset on every switch.
+  // whatever was being tested before it - reset on every switch.
   const resetBattleState = {
     teraType: "",
     useTera: false,
@@ -65,10 +65,10 @@ export async function autofillForSpecies(
 
   const abilities = getSpeciesAbilities(newSpecies);
   const learnedMoves = await getChampionsMoveset(newSpecies);
-  // No real sourced set for this species — suggest the 4 generically most
+  // No real sourced set for this species - suggest the 4 generically most
   // useful moves from its real movepool (STAB damage + staple setup/hazard/
   // recovery moves) rather than picking arbitrarily. Still just a computed
-  // guess, not sourced usage data — see suggestMoves.ts.
+  // guess, not sourced usage data - see suggestMoves.ts.
   const picked = suggestMoves(newSpecies, learnedMoves, 4);
 
   return {
@@ -79,7 +79,7 @@ export async function autofillForSpecies(
     // an unrelated one just because the lookup came back empty.
     ability: abilities[0] ?? "",
     nature: "Hardy",
-    // Reset the held item on every switch, same as EVs/boosts below — the
+    // Reset the held item on every switch, same as EVs/boosts below - the
     // previous species' item (often a Mega Stone, Eviolite, Assault Vest...)
     // has no reason to carry over onto an unrelated Pokémon, and silently
     // keeping it equipped was the actual cause of the "Pokémon tank more or

@@ -13,7 +13,7 @@ function suffix(name: string): "Z" | "X" | "Y" | null {
 
 /**
  * Given a Mega species' display name (e.g. "Mega Absol Z", "Charizard-Mega-X"),
- * returns the exact Mega Stone item that unlocks it — or null if the species
+ * returns the exact Mega Stone item that unlocks it - or null if the species
  * isn't a Mega, or no stone could be matched (e.g. a Mega was added to
  * megaSpecies.ts without a corresponding entry in items.ts yet).
  */
@@ -34,7 +34,7 @@ export function getMegaStoneItem(megaSpeciesName: string): string | null {
   if (candidates.length === 1) return candidates[0].item;
 
   // Multiple stones for this base species (Charizard, Raichu, Absol,
-  // Garchomp, Lucario) — disambiguate by matching the X/Y/Z suffix.
+  // Garchomp, Lucario) - disambiguate by matching the X/Y/Z suffix.
   const wantedSuffix = suffix(megaSpeciesName);
   const match = candidates.find((stone) => suffix(stone.item) === wantedSuffix);
   return match?.item ?? candidates[0].item;

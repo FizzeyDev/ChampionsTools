@@ -1,10 +1,10 @@
-import { computeMoveResults, computeStats } from "../calcEngine";
+import { computeMoveResults, computeStats } from "../calc/calcEngine";
 import { spToEv } from "../champions/statPoints";
 import { META_SETS } from "../champions/metaSets";
-import { SPECIES_NAMES } from "../gen";
-import { defaultPokemon } from "../types";
-import type { FieldState, PokemonState, StatsTable } from "../types";
-import type { StatKey } from "../gen";
+import { SPECIES_NAMES } from "../calc/gen";
+import { defaultPokemon } from "../calc/types";
+import type { FieldState, PokemonState, StatsTable } from "../calc/types";
+import type { StatKey } from "../calc/gen";
 
 export type KoType = "none" | "possible" | "guaranteed";
 export type CompareCategory = "move1" | "move2" | "tie";
@@ -30,7 +30,7 @@ export interface MoveCompareSummary {
 }
 
 /** Species with a curated real competitive set (src/lib/champions/metaSets.ts)
- * — i.e. Pokémon that actually see play. This is the default candidate pool:
+ * - i.e. Pokémon that actually see play. This is the default candidate pool:
  * comparing against random unused Pokémon isn't useful for "which move
  * performs better against the field", so meta-relevant ones come first,
  * same principle as the Speed Tiers defaults. */
@@ -63,7 +63,7 @@ function koType(range: [number, number] | null, maxHp: number): KoType {
 }
 
 /** A fresh defender for `species` at level 50, 0 IV-neutral/31 IV baseline,
- * with the shared bulk Stat Point spread applied — the "0 EV unless
+ * with the shared bulk Stat Point spread applied - the "0 EV unless
  * configured otherwise" baseline the comparator is specified to use. */
 function buildDefender(species: string, defenderSp: Partial<StatsTable>): PokemonState {
   const base = defaultPokemon(species);
@@ -90,7 +90,7 @@ export function compareOne(
   const fail1 = !r1 || !!r1.error || !r1.range;
   const fail2 = !r2 || !!r2.error || !r2.range;
   // Skip only when NEITHER move can be evaluated at all (e.g. both moves
-  // are unset) — a move whiffing/being immune here is itself a useful
+  // are unset) - a move whiffing/being immune here is itself a useful
   // result to show, not something to filter out.
   if (fail1 && fail2) return null;
 

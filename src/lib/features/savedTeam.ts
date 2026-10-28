@@ -1,5 +1,5 @@
-import { defaultPokemon } from "../types";
-import type { PokemonState } from "../types";
+import { defaultPokemon } from "../calc/types";
+import type { PokemonState } from "../calc/types";
 
 const STORAGE_KEY = "champcalc.teamCoverage";
 export const TEAM_SIZE = 6;
@@ -30,7 +30,7 @@ export function saveTeam(team: PokemonState[]) {
   try {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(team));
   } catch {
-    // storage full or unavailable — silently ignore
+    // storage full or unavailable - silently ignore
   }
 }
 
@@ -64,7 +64,7 @@ function writeNamed(entries: SavedTeam[]) {
   try {
     window.localStorage.setItem(NAMED_STORAGE_KEY, JSON.stringify(entries));
   } catch {
-    // storage full or unavailable — silently ignore
+    // storage full or unavailable - silently ignore
   }
 }
 

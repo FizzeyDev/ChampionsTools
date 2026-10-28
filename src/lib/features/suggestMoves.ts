@@ -1,4 +1,4 @@
-import { gen } from "../gen";
+import { gen } from "../calc/gen";
 import { champGen } from "../champions/megaSpecies";
 
 /** Status moves valuable enough to suggest even though they deal no direct
@@ -6,7 +6,7 @@ import { champGen } from "../champions/megaSpecies";
  * the Status category gets a low baseline score so it only gets suggested
  * when nothing better is available. This is a computed heuristic based on
  * the move's own data (power/type/category/priority) plus this curated
- * "generically strong" list — NOT sourced real usage data the way
+ * "generically strong" list - NOT sourced real usage data the way
  * src/lib/champions/metaSets.ts is. It only kicks in as a fallback for
  * species that don't have a real curated set. */
 const STRONG_STATUS = new Set([
@@ -69,7 +69,7 @@ function scoreMove(moveName: string, stabTypes: Set<string>, betterStat: "atk" |
   else if (m.flags?.charge) situational = 0.5;
 
   // A physical move on a special attacker (or vice versa) isn't something
-  // that species would actually run — discount unless the two offensive
+  // that species would actually run - discount unless the two offensive
   // stats are close.
   let categoryFit = 1;
   if (betterStat === "atk" && m.category === "Special") categoryFit = 0.35;
@@ -84,7 +84,7 @@ function scoreMove(moveName: string, stabTypes: Set<string>, betterStat: "atk" |
 }
 
 /** Picks the `count` most generically useful moves from a species' real
- * movepool — STAB damage and a short list of staple utility/setup/hazard
+ * movepool - STAB damage and a short list of staple utility/setup/hazard
  * moves outrank everything else. Used as the fallback autofill for species
  * without a curated real competitive set (metaSets.ts); those always take
  * priority over this heuristic when they exist. */

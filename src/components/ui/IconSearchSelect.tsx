@@ -1,0 +1,362 @@
+"use client";
+
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useLocale } from "@/lib/i18n/LocaleContext";
+import { toFrench, matchesBilingual } from "@/lib/champions/gameTranslations";
+
+interface Option {
+  value: string;
+  subtitle?: ReactNode;
+  preferred?: boolean;
+  marked?: boolean;
+}
+
+interface ExtraGroupItem {
+  id: string;
+  label: string;
+  subtitle?: ReactNode;
+  icon?: string | null;
+}
+
+type Row =
+  | { kind: "header"; label: string }
+  | { kind: "option"; opt: Option }
+  | { kind: "extra"; item: ExtraGroupItem };
+
+interface IconSearchSelectProps {
+  label: string;
+  value: string;
+  options: string[];
+  iconUrl?: (value: string) => string | null;
+  subtitle?: (value: string) => ReactNode;
+  placeholder?: string;
+  allowEmpty?: boolean;
+  onChange: (value: string) => void;
+  /** Values that should float to the top, visually highlighted (e.g. a
+   * Pokémon's real abilities/moveset among the full list). */
+  isPreferred?: (value: string) => boolean;
+  preferredLabel?: string;
+  /** Group options into labelled sections, in this order (e.g. item
+   * categories). Options not covered by groupOf fall in an "Other" bucket. */
+  groupOf?: (value: string) => string;
+  groupOrder?: string[];
+  /** Small badge shown at the end of a matching option's row (e.g. a star
+   * marking Pokémon with a curated real competitive set). Purely cosmetic -
+   * doesn't affect sorting or filtering. */
+  isMarked?: (value: string) => boolean;
+  markedTitle?: string;
+  /** Tooltip shown when hovering the closed field (e.g. the current
+   * item/ability/move's official description). Not shown while typing. */
+  valueTitle?: string;
+  /** When set, options are shown in French (with the English value kept as
+   * the real underlying value) when the site's locale is French, and
+   * searching matches either language regardless of the current locale
+   * (e.g. typing "Sarmurai" finds Golisopod even in the English UI). */
+  translateKind?: "species" | "move" | "ability" | "item" | "nature";
+  /** An extra, separately-matched section shown above everything else while
+   * actively searching (e.g. the person's own saved Pokémon builds, matched
+   * by their custom name - "Absol Z" - rather than the species list this
+   * field otherwise searches). Selecting one calls `onSelect(id)` instead
+   * of the normal `onChange`, since picking a save usually needs to load
+   * more than just this one field's value. */
+  extraGroup?: {
+    heading: string;
+    items: ExtraGroupItem[];
+    onSelect: (id: string) => void;
+  };
+}
+
+export default function IconSearchSelect({
+  label,
+  value,
+  options,
+  iconUrl,
+  subtitle,
+  placeholder,
+  allowEmpty = true,
+  onChange,
+  isPreferred,
+  preferredLabel,
+  groupOf,
+  groupOrder,
+  isMarked,
+  markedTitle,
+  valueTitle,
+  translateKind,
+  extraGroup,
+}: IconSearchSelectProps) {
+  const { t, locale } = useLocale();
+  const [query, setQuery] = useState(value);
+  const [open, setOpen] = useState(false);
+  const [highlight, setHighlight] = useState(0);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const displayName = (v: string) => (translateKind && locale === "fr" ? toFrench(translateKind, v) : v);
+
+  useEffect(() => {
+    if (!open) setQuery(displayName(value));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value, open, locale]);
+
+  const rows: Row[] = useMemo(() => {
+    const q = query.trim();
+    const matched = q
+      ? options.filter((o) => (translateKind ? matchesBilingual(translateKind, o, q) : o.toLowerCase().includes(q.toLowerCase())))
+      : options;
+
+    // Saved builds (or similar) matched by their own custom name, shown
+    // above the normal list only while actively typing - otherwise every
+    // field would open cluttered with them at rest.
+    const extraRows: Row[] = [];
+    if (extraGroup && q) {
+      const matches = extraGroup.items.filter((it) => it.label.toLowerCase().includes(q.toLowerCase()));
+      if (matches.length) {
+        extraRows.push({ kind: "header", label: extraGroup.heading });
+        for (const it of matches.slice(0, 8)) extraRows.push({ kind: "extra", item: it });
+      }
+    }
+
+    if (isPreferred) {
+      const preferred = matched.filter((v) => isPreferred(v)).slice(0, 40);
+      const rest = matched.filter((v) => !isPreferred(v)).slice(0, 40);
+      const out: Row[] = [...extraRows];
+      if (preferred.length) {
+        out.push({ kind: "header", label: preferredLabel ?? t("select.preferred") });
+        for (const v of preferred) out.push({ kind: "option", opt: { value: v, subtitle: subtitle?.(v), preferred: true, marked: isMarked?.(v) } });
+        out.push({ kind: "header", label: t("select.allOptions") });
+      }
+      for (const v of rest) out.push({ kind: "option", opt: { value: v, subtitle: subtitle?.(v), marked: isMarked?.(v) } });
+      return out;
+    }
+
+    if (groupOf) {
+      const buckets = new Map<string, string[]>();
+      for (const v of matched) {
+        const g = groupOf(v);
+        if (!buckets.has(g)) buckets.set(g, []);
+        buckets.get(g)!.push(v);
+      }
+      const order = groupOrder ?? [...buckets.keys()];
+      const out: Row[] = [...extraRows];
+      let shown = 0;
+      for (const g of order) {
+        const vals = buckets.get(g);
+        if (!vals?.length) continue;
+        out.push({ kind: "header", label: g });
+        for (const v of vals) {
+          if (shown >= 90) break;
+          out.push({ kind: "option", opt: { value: v, subtitle: subtitle?.(v), marked: isMarked?.(v) } });
+          shown++;
+        }
+      }
+      return out;
+    }
+
+    return [...extraRows, ...matched.slice(0, 60).map((v) => ({ kind: "option" as const, opt: { value: v, subtitle: subtitle?.(v), marked: isMarked?.(v) } }))];
+  }, [query, options, subtitle, isPreferred, preferredLabel, groupOf, groupOrder, isMarked, translateKind, extraGroup, t]);
+
+  // Both real options AND extra-group items are keyboard-navigable/clickable rows.
+  const optionRows = rows.filter(
+    (r): r is { kind: "option"; opt: Option } | { kind: "extra"; item: ExtraGroupItem } =>
+      r.kind === "option" || r.kind === "extra"
+  );
+
+  const commit = (v: string) => {
+    onChange(v);
+    setQuery(displayName(v));
+    setOpen(false);
+  };
+
+  const icon = iconUrl?.(value) ?? null;
+
+  return (
+    <div className="relative flex flex-col gap-1 text-sm" ref={containerRef}>
+      <span className="eyebrow">{label}</span>
+      <div className="relative">
+        {icon && (
+          <img
+            src={icon}
+            alt=""
+            className="pointer-events-none absolute left-1.5 top-1/2 h-6 w-6 -translate-y-1/2 object-contain"
+            onError={(e) => ((e.target as HTMLImageElement).style.display = "none")}
+          />
+        )}
+        <input
+          className="field-input w-full py-2 pr-3"
+          style={{ paddingLeft: icon ? "2.25rem" : "0.75rem" }}
+          value={open ? query : displayName(value)}
+          placeholder={placeholder}
+          title={!open ? valueTitle : undefined}
+          onFocus={() => {
+            setOpen(true);
+            setQuery("");
+            setHighlight(0);
+          }}
+          onChange={(e) => {
+            setQuery(e.target.value);
+            setOpen(true);
+            setHighlight(0);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "ArrowDown") {
+              e.preventDefault();
+              setHighlight((h) => Math.min(h + 1, optionRows.length - 1));
+            } else if (e.key === "ArrowUp") {
+              e.preventDefault();
+              setHighlight((h) => Math.max(h - 1, 0));
+            } else if (e.key === "Enter") {
+              e.preventDefault();
+              const row = optionRows[highlight];
+              if (row?.kind === "extra") {
+                extraGroup?.onSelect(row.item.id);
+                setOpen(false);
+              } else if (row?.kind === "option") {
+                commit(row.opt.value);
+              } else if (allowEmpty && query.trim() === "") {
+                commit("");
+              }
+            } else if (e.key === "Escape") {
+              setOpen(false);
+              setQuery(displayName(value));
+            }
+          }}
+          onBlur={() => {
+            window.setTimeout(() => {
+              setOpen(false);
+              setQuery(displayName(value));
+            }, 100);
+          }}
+        />
+      </div>
+      {open && (
+        <div
+          className="absolute top-full z-20 mt-1 max-h-80 w-full overflow-auto rounded-[10px]"
+          style={{ background: "var(--color-panel-strong)", border: "1px solid var(--color-line-strong)", boxShadow: "var(--shadow-lg)" }}
+        >
+          {allowEmpty && (
+            <button
+              type="button"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => commit("")}
+              className="flex w-full items-center px-3 py-1.5 text-left text-sm hover:bg-[var(--color-league-soft)]"
+              style={{ color: "var(--color-ink-dim)" }}
+            >
+              {t("select.none")}
+            </button>
+          )}
+          {rows.length === 0 && (
+            <p className="px-3 py-2 text-sm" style={{ color: "var(--color-ink-dim)" }}>
+              {t("select.noResults")}
+            </p>
+          )}
+          {(() => {
+            let optionIndex = -1;
+            return rows.map((row, i) => {
+              if (row.kind === "header") {
+                return (
+                  <p
+                    key={`h-${i}`}
+                    className="eyebrow px-3 pb-1 pt-2 text-[0.6rem]"
+                    style={{ color: "var(--color-violet)" }}
+                  >
+                    {row.label}
+                  </p>
+                );
+              }
+              optionIndex++;
+              const idx = optionIndex;
+
+              if (row.kind === "extra") {
+                const item = row.item;
+                return (
+                  <button
+                    type="button"
+                    key={`extra-${item.id}`}
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => {
+                      extraGroup?.onSelect(item.id);
+                      setOpen(false);
+                    }}
+                    className="flex w-full items-center gap-2 px-2 py-1.5 text-left text-sm"
+                    style={{
+                      background: idx === highlight ? "var(--color-amber-soft)" : "transparent",
+                      color: "var(--color-ink)",
+                      borderLeft: "2px solid var(--color-amber)",
+                    }}
+                  >
+                    {item.icon && (
+                      <img
+                        src={item.icon}
+                        alt=""
+                        className="h-7 w-7 shrink-0 object-contain"
+                        onError={(e) => ((e.target as HTMLImageElement).style.visibility = "hidden")}
+                      />
+                    )}
+                    <span className="flex flex-1 flex-col leading-tight">
+                      <span>{item.label}</span>
+                      {item.subtitle && (
+                        <span className="text-xs" style={{ color: "var(--color-ink-dim)" }}>
+                          {item.subtitle}
+                        </span>
+                      )}
+                    </span>
+                    <span className="shrink-0 text-xs" style={{ color: "var(--color-amber)" }}>
+                      ★
+                    </span>
+                  </button>
+                );
+              }
+
+              const opt = row.opt;
+              return (
+                <button
+                  type="button"
+                  key={opt.value}
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={() => commit(opt.value)}
+                  className="flex w-full items-center gap-2 px-2 py-1.5 text-left text-sm"
+                  style={{
+                    background:
+                      idx === highlight
+                        ? "var(--color-league-soft)"
+                        : opt.preferred
+                          ? "var(--color-violet-soft)"
+                          : "transparent",
+                    color: "var(--color-ink)",
+                    borderLeft: opt.preferred ? "2px solid var(--color-violet)" : "2px solid transparent",
+                  }}
+                >
+                  {iconUrl?.(opt.value) && (
+                    <img
+                      src={iconUrl(opt.value)!}
+                      alt=""
+                      className="h-7 w-7 shrink-0 object-contain"
+                      onError={(e) => ((e.target as HTMLImageElement).style.visibility = "hidden")}
+                    />
+                  )}
+                  <span className="flex flex-1 flex-col leading-tight">
+                    <span>{displayName(opt.value)}</span>
+                    {opt.subtitle && (
+                      <span className="text-xs" style={{ color: "var(--color-ink-dim)" }}>
+                        {opt.subtitle}
+                      </span>
+                    )}
+                  </span>
+                  {opt.marked && (
+                    <span
+                      className="shrink-0 text-xs"
+                      style={{ color: "var(--color-amber)" }}
+                      title={markedTitle}
+                    >
+                      ★
+                    </span>
+                  )}
+                </button>
+              );
+            });
+          })()}
+        </div>
+      )}
+    </div>
+  );
+}

@@ -1,27 +1,37 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import PokemonCard from "@/components/PokemonCard";
-import FieldBar from "@/components/FieldBar";
-import ResultPanel from "@/components/ResultPanel";
-import TeamRoster from "@/components/TeamRoster";
-import AllVsAllMatrix from "@/components/AllVsAllMatrix";
-import SpeedComparator from "@/components/SpeedComparator";
-import MoveComparator from "@/components/MoveComparator";
-import SavedPokemonModal from "@/components/SavedPokemonModal";
-import TeamCoverage from "@/components/TeamCoverage";
-import ChangelogPage from "@/components/ChangelogPage";
-import Sidebar, { type Mode, type View } from "@/components/Sidebar";
-import { computeMoveResults, type MoveResult } from "@/lib/calcEngine";
+import PokemonCard from "@/components/calculator/PokemonCard";
+import FieldBar from "@/components/calculator/FieldBar";
+import ResultPanel from "@/components/calculator/ResultPanel";
+import TeamRoster from "@/components/team/TeamRoster";
+import AllVsAllMatrix from "@/components/calculator/AllVsAllMatrix";
+import SpeedComparator from "@/components/speed/SpeedComparator";
+import MoveComparator from "@/components/calculator/MoveComparator";
+import SavedPokemonModal from "@/components/calculator/SavedPokemonModal";
+import TeamCoverage from "@/components/team/TeamCoverage";
+import ChangelogPage from "@/components/shell/ChangelogPage";
+import PokedexView from "@/components/encyclopedia/PokedexView";
+import SearchView from "@/components/encyclopedia/SearchView";
+import DatabaseView from "@/components/encyclopedia/DatabaseView";
+import TypeToolsView from "@/components/encyclopedia/TypeToolsView";
+import OptimizerView from "@/components/calculator/OptimizerView";
+import SettingsView from "@/components/shell/SettingsView";
+import KeyboardShortcuts, { type GoTarget } from "@/components/shell/KeyboardShortcuts";
+import PokemonSheet from "@/components/encyclopedia/PokemonSheet";
+import Sidebar, { type Mode } from "@/components/shell/Sidebar";
+import { NavContext, type DbTab, type NavValue, type View } from "@/lib/app/nav";
+import { computeMoveResults, swapSides, type MoveResult } from "@/lib/calc/calcEngine";
+import ComboTray, { type ComboEntry, type Slot } from "@/components/calculator/ComboTray";
 import { computeBestMoves } from "@/lib/features/bestMoves";
-import { defaultField, defaultPokemon } from "@/lib/types";
+import { defaultField, defaultPokemon } from "@/lib/calc/types";
 import { autofillForSpecies } from "@/lib/features/autofillSpecies";
-import { buildShareUrl, readStateFromLocation } from "@/lib/shareLink";
+import { buildShareUrl, readStateFromLocation } from "@/lib/share/shareLink";
 import { useLocale } from "@/lib/i18n/LocaleContext";
-import type { PokemonState } from "@/lib/types";
+import type { PokemonState } from "@/lib/calc/types";
 
 export default function Home() {
-  const { locale, t } = useLocale();
+  const { locale, setLocale, t } = useLocale();
 
   const [view, setView] = useState<View>("calculator");
   const [mode, setMode] = useState<Mode>("1v1");
@@ -37,6 +47,31 @@ export default function Home() {
   const [bestLoading, setBestLoading] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
+  const [defender2, setDefender2] = useState<PokemonState | null>(null);
+  const [combo, setCombo] = useState<ComboEntry[]>([]);
+  const [comboSeq, setComboSeq] = useState(1);
+  const [sheetSpecies, setSheetSpecies] = useState<string | null>(null);
+  const [dbTarget, setDbTarget] = useState<{ tab: DbTab; name: string } | null>(null);
+
+  const nav = useMemo<NavValue>(
+    () => ({
+      sheetSpecies,
+      openSpecies: (species) => setSheetSpecies(species),
+      closeSheet: () => setSheetSpecies(null),
+      goView: (v) => {
+        setSheetSpecies(null);
+        setView(v);
+      },
+      openDatabase: (tab, name) => {
+        setSheetSpecies(null);
+        setDbTarget({ tab, name });
+        setView("database");
+      },
+      dbTarget,
+    }),
+    [sheetSpecies, dbTarget]
+  );
 
   useEffect(() => {
     try {
@@ -58,7 +93,7 @@ export default function Home() {
     });
   };
 
-  // Champions matches are 3v3 (Singles) or 4v4 (Doubles) — never 6v6, even
+  // Champions matches are 3v3 (Singles) or 4v4 (Doubles) - never 6v6, even
   // though you build a roster of 6 beforehand. Team-mode rosters are capped
   // to the active battle size, and trimmed automatically if the format
   // switches to a smaller one.
@@ -69,6 +104,9 @@ export default function Home() {
   }, [maxTeamSize]);
 
   useEffect(() => {
+    const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+    if (hashParams.get("search")) setView("search");
+    else if (hashParams.get("team")) setView("teamCoverage");
     const shared = readStateFromLocation();
     if (shared) {
       setAttacker(shared.attacker);
@@ -87,9 +125,26 @@ export default function Home() {
     () => computeMoveResults(attacker, defender, field),
     [attacker, defender, field]
   );
+  // Seen from the defender's side, the two field sides are swapped.
+  const backwardField = useMemo(() => swapSides(field), [field]);
   const backwardResults = useMemo(
-    () => computeMoveResults(defender, attacker, field),
-    [attacker, defender, field]
+    () => computeMoveResults(defender, attacker, backwardField),
+    [attacker, defender, backwardField]
+  );
+  const secondResults = useMemo(
+    () => (defender2 ? computeMoveResults(attacker, defender2, field) : []),
+    [attacker, defender2, field]
+  );
+
+  const addHit = (from: PokemonState, to: Slot, moveIndex: number) => {
+    const move = from.moves[moveIndex];
+    if (!move) return;
+    setCombo((c) => [...c, { id: comboSeq, source: from, to, move, crit: !!from.critMoves[moveIndex] }]);
+    setComboSeq((n) => n + 1);
+  };
+  const comboFieldFor = useMemo(
+    () => (to: Slot) => (to === "attacker" ? backwardField : field),
+    [field, backwardField]
   );
 
   useEffect(() => {
@@ -98,7 +153,7 @@ export default function Home() {
     setBestLoading(true);
     Promise.all([
       computeBestMoves(attacker, defender, field),
-      computeBestMoves(defender, attacker, field),
+      computeBestMoves(defender, attacker, backwardField),
     ]).then(([fwd, bwd]) => {
       if (cancelled) return;
       setBestForward(fwd);
@@ -108,11 +163,27 @@ export default function Home() {
     return () => {
       cancelled = true;
     };
-  }, [mode, attacker, defender, field]);
+  }, [mode, attacker, defender, field, backwardField]);
 
   const swap = () => {
     setAttacker(defender);
     setDefender(attacker);
+  };
+
+  const goTo = (target: GoTarget) => {
+    setSheetSpecies(null);
+    setMobileNavOpen(false);
+    if (target === "calc") {
+      setMode((m) => (m === "speedTiers" ? "1v1" : m));
+      setView("calculator");
+    } else if (target === "speed") {
+      setMode("speedTiers");
+      setView("calculator");
+    } else {
+      setView(
+        ({ team: "teamCoverage", dex: "pokedex", search: "search", db: "database", types: "types", opt: "optimizer", new: "changelog" } as const)[target]
+      );
+    }
   };
 
   const toggleCrit = (
@@ -147,6 +218,7 @@ export default function Home() {
   };
 
   return (
+    <NavContext.Provider value={nav}>
     <div className="min-h-screen">
       <Sidebar
         view={view}
@@ -180,8 +252,9 @@ export default function Home() {
               </h1>
               <p className="hidden truncate text-xs text-ink-dim sm:block">{t("app.subtitle")}</p>
             </div>
-            {view === "calculator" && (
-              <div className="ml-auto flex flex-wrap items-center gap-2">
+            <div className="ml-auto flex flex-wrap items-center gap-2">
+              {view === "calculator" && (
+                <>
                 <button
                   onClick={share}
                   className="pill-btn"
@@ -205,27 +278,68 @@ export default function Home() {
                     ⇄ {t("app.swap")}
                   </button>
                 )}
-              </div>
-            )}
+                </>
+              )}
+              <button
+                onClick={() => setHelpOpen(true)}
+                className="pill-btn hidden sm:inline-flex"
+                title={t("kbd.title")}
+                aria-label={t("kbd.title")}
+              >
+                ⌨ ?
+              </button>
+            </div>
           </div>
         </header>
 
         <div className="mx-auto flex w-full max-w-[1600px] flex-col gap-5 px-4 py-6 sm:px-6">
+        {view === "pokedex" && <PokedexView />}
+
+        {view === "search" && <SearchView />}
+
+        {view === "database" && <DatabaseView />}
+
+        {view === "types" && <TypeToolsView />}
+
+        {view === "optimizer" && (
+          <OptimizerView
+            attacker={attacker}
+            defender={defender}
+            field={field}
+            onChangeAttacker={setAttacker}
+            onChangeDefender={setDefender}
+          />
+        )}
+
         {view === "teamCoverage" && <TeamCoverage />}
 
         {view === "changelog" && <ChangelogPage />}
+
+        {view === "settings" && <SettingsView />}
 
         {view === "calculator" && (
           <>
         {mode === "1v1" && (
           <>
-            <div className="grid grid-cols-2 gap-2 sm:gap-5">
+            <div className="flex justify-end">
+              {defender2 ? (
+                <button type="button" className="pill-btn" onClick={() => setDefender2(null)}>
+                  ✕ {t("calc.removeSecondTarget")}
+                </button>
+              ) : (
+                <button type="button" className="pill-btn" onClick={() => setDefender2({ ...defender })}>
+                  {t("calc.secondTarget")}
+                </button>
+              )}
+            </div>
+            <div className={`grid grid-cols-2 gap-2 sm:gap-5 ${defender2 ? "xl:grid-cols-3" : ""}`}>
               <ResultPanel
                 title={`${attacker.species || t("card.attacker")} → ${defender.species || t("card.defender")}`}
                 accent="league"
                 results={forwardResults}
                 critMoves={attacker.critMoves}
                 onToggleCrit={(i) => toggleCrit(setAttacker, attacker, i)}
+                onAddHit={(i) => addHit(attacker, "defender", i)}
                 attacker={attacker}
                 defender={defender}
                 field={field}
@@ -236,12 +350,33 @@ export default function Home() {
                 results={backwardResults}
                 critMoves={defender.critMoves}
                 onToggleCrit={(i) => toggleCrit(setDefender, defender, i)}
+                onAddHit={(i) => addHit(defender, "attacker", i)}
                 attacker={defender}
                 defender={attacker}
-                field={field}
+                field={backwardField}
               />
+              {defender2 && (
+                <ResultPanel
+                  title={`${attacker.species || t("card.attacker")} → ${defender2.species || t("calc.secondTargetTitle")}`}
+                  accent="league"
+                  results={secondResults}
+                  critMoves={attacker.critMoves}
+                  onToggleCrit={(i) => toggleCrit(setAttacker, attacker, i)}
+                  onAddHit={(i) => addHit(attacker, "defender2", i)}
+                  attacker={attacker}
+                  defender={defender2}
+                  field={field}
+                />
+              )}
             </div>
-            <div className="grid gap-5 xl:grid-cols-[0.85fr_560px_0.85fr]">
+            <ComboTray
+              entries={combo}
+              targets={{ attacker, defender, defender2 }}
+              fieldFor={comboFieldFor}
+              onRemove={(id) => setCombo((c) => c.filter((e) => e.id !== id))}
+              onClear={() => setCombo([])}
+            />
+            <div className="grid gap-5 2xl:grid-cols-[minmax(0,0.85fr)_560px_minmax(0,0.85fr)]">
               <PokemonCard
                 role="attacker"
                 accent="league"
@@ -260,6 +395,20 @@ export default function Home() {
                 sideKey="defenderSide"
               />
             </div>
+            {defender2 && (
+              <div className="grid gap-5 2xl:grid-cols-[minmax(0,0.85fr)_560px_minmax(0,0.85fr)]">
+                <div />
+                <div />
+                <PokemonCard
+                  role="defender"
+                  accent="brick"
+                  state={defender2}
+                  onChange={setDefender2}
+                  field={field}
+                  sideKey="defenderSide"
+                />
+              </div>
+            )}
           </>
         )}
 
@@ -283,7 +432,7 @@ export default function Home() {
                 <p className="text-sm text-ink-dim">{t("team.importPlaceholder")}</p>
               )}
             </div>
-            <div className="grid gap-5 xl:grid-cols-[0.85fr_560px_0.85fr]">
+            <div className="grid gap-5 2xl:grid-cols-[minmax(0,0.85fr)_560px_minmax(0,0.85fr)]">
               <PokemonCard
                 role="attacker"
                 accent="league"
@@ -318,7 +467,7 @@ export default function Home() {
                 <p className="text-sm text-ink-dim">{t("team.importPlaceholder")}</p>
               )}
             </div>
-            <div className="grid gap-5 xl:grid-cols-[0.85fr_560px_0.85fr]">
+            <div className="grid gap-5 2xl:grid-cols-[minmax(0,0.85fr)_560px_minmax(0,0.85fr)]">
               <TeamRoster team={team} onChange={setTeam} accent="league" maxSize={maxTeamSize} />
               <FieldBar state={field} onChange={setField} />
               <PokemonCard
@@ -338,7 +487,7 @@ export default function Home() {
             <div className="card-shell p-4">
               <AllVsAllMatrix teamA={team} teamB={teamB} field={field} />
             </div>
-            <div className="grid gap-5 xl:grid-cols-[1fr_560px_1fr]">
+            <div className="grid gap-5 2xl:grid-cols-[minmax(0,1fr)_560px_minmax(0,1fr)]">
               <TeamRoster team={team} onChange={setTeam} accent="league" maxSize={maxTeamSize} />
               <FieldBar state={field} onChange={setField} />
               <TeamRoster team={teamB} onChange={setTeamB} accent="brick" maxSize={maxTeamSize} />
@@ -369,10 +518,10 @@ export default function Home() {
                 configurableLimit
                 attacker={defender}
                 defender={attacker}
-                field={field}
+                field={backwardField}
               />
             </div>
-            <div className="grid gap-5 xl:grid-cols-[0.85fr_560px_0.85fr]">
+            <div className="grid gap-5 2xl:grid-cols-[minmax(0,0.85fr)_560px_minmax(0,0.85fr)]">
               <PokemonCard
                 role="attacker"
                 accent="league"
@@ -414,6 +563,17 @@ export default function Home() {
           else setDefender(pkm);
         }}
       />
+      <PokemonSheet />
+      <KeyboardShortcuts
+        onGo={goTo}
+        onSwap={() => {
+          if (view === "calculator" && (mode === "1v1" || mode === "bestMoves")) swap();
+        }}
+        onToggleLocale={() => setLocale(locale === "fr" ? "en" : "fr")}
+        helpOpen={helpOpen}
+        setHelpOpen={setHelpOpen}
+      />
     </div>
+    </NavContext.Provider>
   );
 }

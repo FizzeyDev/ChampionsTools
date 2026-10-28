@@ -9,7 +9,7 @@ const gen9 = gens.get(9);
 
 // Champions reintroduces Mega Evolution with 75 Mega Stones (see items.ts).
 // Stats below are sourced two ways:
-//  - Classic Gen 6/7 Megas: pulled straight from @pkmn/dex (gen 7) — these
+//  - Classic Gen 6/7 Megas: pulled straight from @pkmn/dex (gen 7) - these
 //    never change between games.
 //  - Champions-exclusive Megas (first seen in Pokémon Legends: Z-A): manually
 //    verified against Serebii's Champions stat rankings
@@ -17,7 +17,7 @@ const gen9 = gens.get(9);
 // Still pending (confirmed ability/type from the Champions ability table,
 // stats not yet verified): Scovillain. There's also a newer Reg M-C update
 // adding Mega Salamence, Mega Golisopod, Mega Baxcalibur and ~20 new base
-// Pokémon (Rillaboom, Mabosstiff...) — see champions/pokedex.ts for the
+// Pokémon (Rillaboom, Mabosstiff...) - see champions/pokedex.ts for the
 // current status of that list.
 
 interface MegaDef {
@@ -110,7 +110,7 @@ if (charY) megaDefs.push({ ...charY, name: "Charizard-Mega-Y" });
 // Lucario has two distinct Megas in Champions: the classic ORAS one
 // (Adaptability, pulled automatically above as "Lucario-Mega") and a new
 // "Z" variant with a different ability AND a completely different stat
-// spread — verified against Serebii's Champions stat rankings, not just an
+// spread - verified against Serebii's Champions stat rankings, not just an
 // ability swap.
 megaDefs.push({
   name: "Mega Lucario Z",
@@ -390,7 +390,7 @@ megaDefs.push({
   types: ["Bug", "Steel"],
   baseStats: { hp: 75, atk: 150, def: 175, spa: 70, spd: 120, spe: 40 },
   // Confirmed via champdex.com/dex/mega-golisopod and
-  // pokebase.app/pokemon-champions/pokemon/golisopod-mega — usage-stat pages
+  // pokebase.app/pokemon-champions/pokemon/golisopod-mega - usage-stat pages
   // show "Emergency Exit" because that's Golisopod's pre-Mega base ability
   // as listed on team sheets, not what the Mega itself actually has in battle.
   ability: "Tough Claws",
@@ -425,7 +425,7 @@ export const champGen = {
   abilities: gen9.abilities,
   // Mega Stones (and a few other Champions items) are tagged "Past" by
   // @pkmn/dex since they're not part of SV's own standard item pool, so
-  // gen9.items filters them out — same root cause as the "Past" species
+  // gen9.items filters them out - same root cause as the "Past" species
   // issue. Falling back to the raw, unfiltered Dex recovers them with their
   // correct .megaStone mapping intact, which @smogon/calc's damage-calc
   // internals read directly (a missing entry there crashes the calc, not

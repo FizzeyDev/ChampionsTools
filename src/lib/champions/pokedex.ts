@@ -1,6 +1,6 @@
 // The exact roster currently obtainable in Pokémon Champions (per the game's
 // own in-app Pokédex, cross-checked via Serebii's Champions Pokédex index).
-// Champions launched with 187 species and has grown via updates since —
+// Champions launched with 187 species and has grown via updates since -
 // 208 at one point, and this list also includes the newer Reg M-C addition
 // (~22 more species: Salamence, Golisopod, Baxcalibur, Rillaboom...). If the
 // game adds more, just append the species name here (it must match
@@ -53,7 +53,7 @@ const CHAMPIONS_POKEDEX_RAW: string[] = [
   "Salamence", "Golisopod", "Baxcalibur", "Rillaboom", "Mabosstiff", "Persian", "Persian-Alola",
   "Samurott-Hisui", "Inteleon", "Cinderace", "Arboliva", "Sirfetch'd", "Toxtricity", "Gogoat",
   "Indeedee", "Indeedee-F", "Pawmot",
-  // Found via Pikalytics' live usage feed — legitimate, played forms missing from our list
+  // Found via Pikalytics' live usage feed - legitimate, played forms missing from our list
   "Floette-Eternal", "Arcanine-Hisui", "Ninetales-Alola", "Lycanroc-Dusk", "Lycanroc-Midnight",
   "Zoroark-Hisui", "Rotom-Heat", "Rotom-Mow", "Rotom-Frost", "Typhlosion-Hisui", "Decidueye-Hisui",
   "Slowking-Galar", "Slowbro-Galar", "Goodra-Hisui", "Tauros-Paldea-Aqua", "Tauros-Paldea-Blaze",
@@ -65,5 +65,5 @@ const CHAMPIONS_POKEDEX_RAW: string[] = [
 
 // Safety net: dedupe in case a future edit accidentally re-adds a species
 // that's already listed elsewhere (this caused a real "duplicate Samurott"
-// bug — see the entry above).
+// bug - see the entry above).
 export const CHAMPIONS_POKEDEX = Array.from(new Set(CHAMPIONS_POKEDEX_RAW));

@@ -9,7 +9,7 @@ export const REGIONAL_ARTWORK_IDS: Record<string, number> = {
   "Samurott-Hisui": 10236,
 };
 
-// 2. Items that genuinely don't exist yet in the PokeAPI sprites CDN —
+// 2. Items that genuinely don't exist yet in the PokeAPI sprites CDN -
 //    mostly Champions-exclusive Mega Stones that never appeared in a
 //    mainline game before, so no fan/official sprite has been catalogued
 //    there. Verified by checking each URL directly (36 mega stones + Fairy
@@ -17,7 +17,7 @@ export const REGIONAL_ARTWORK_IDS: Record<string, number> = {
 //
 // For these, itemSpriteUrl() points at /custom-sprites/items/<kebab-name>.png
 // instead of the CDN. Drop a same-named PNG into public/custom-sprites/items/
-// and it'll be picked up automatically — no code change needed. Exact
+// and it'll be picked up automatically - no code change needed. Exact
 // filenames (kebab-case, matching the item's display name):
 export const MISSING_ITEM_SPRITES: string[] = [
   "fairy-feather",
@@ -61,18 +61,18 @@ export const MISSING_ITEM_SPRITES: string[] = [
   "garchompite-z",
   "lucarionite-z",
 ];
-// 4. Item name aliases — PokeAPI still uses an item's older/internal name
+// 4. Item name aliases - PokeAPI still uses an item's older/internal name
 //    for its sprite file even after an in-game rename. Maps our display
 //    name (kebab-case) to the sprite's actual kebab-case filename.
 export const ITEM_SPRITE_ALIASES: Record<string, string> = {
   leek: "stick", // Farfetch'd's item was called "Stick" pre-Gen 8
 };
 
-// 3. Mega Evolution artwork/sprites — Mega forms share their base
+// 3. Mega Evolution artwork/sprites - Mega forms share their base
 //    species's national dex number in-game, so the generic num-based
 //    lookup would show the wrong (base-form) artwork. PokeAPI catalogues
 //    every Mega (including the Champions-exclusive ones) under its own
-//    unique internal id via the pokemon-species "varieties" list —
+//    unique internal id via the pokemon-species "varieties" list -
 //    verified directly against PokeAPI/api-data for all 78 Megas.
 export const MEGA_ARTWORK_IDS: Record<string, number> = {
   "Abomasnow-Mega": 10060,
